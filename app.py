@@ -12,7 +12,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# ─── CSS ─────────────────────────────────────────────────────────────────────
+# ─── CSS (mantido, mas com pequenos ajustes para garantir o fluxo) ─────────
 st.markdown("""
 <style>
 /* ── Reset & globals ── */
@@ -20,7 +20,10 @@ st.markdown("""
 
 html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 
-.block-container { padding: 0 1.5rem 2rem 1.5rem !important; max-width: 100% !important; }
+.block-container {
+    padding: 0 1.5rem 2rem 1.5rem !important;
+    max-width: 100% !important;
+}
 
 /* ── Header banner ── */
 .header-banner {
@@ -34,6 +37,7 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     display: flex;
     align-items: center;
     gap: 1.2rem;
+    flex-wrap: wrap;
 }
 .header-logo { font-size: 2.2rem; }
 .header-title { color: #ffffff; font-size: 1.7rem; font-weight: 800; line-height: 1.15; margin: 0; }
@@ -199,7 +203,7 @@ n_entre10_90 = sum(1 for a in acudes if 10 <= a["pct"] < 90)
 n_abaixo10  = sum(1 for a in acudes if a["pct"] < 10)
 total_acudes = len(acudes)
 
-# ── Programação de Hoje ──────
+# ── Programação de Hoje (do arquivo original) ──
 prog_hoje = [
     "Solicitar apoio logístico para Erandir - reunião do FCCBH (PROCOMITÊ)",
     "Publicação de aniversário de Raimundo Ribeiro Sales",
@@ -213,9 +217,8 @@ def pct(real, meta):
     if meta == 0: return 0
     return round(real / meta * 100, 1)
 
-def pbar(val, meta, w=120, h=80):
-    """Donut-style gauge using Plotly, returns html string via fig.to_html."""
-    p = min(pct(val, meta), 100)
+def pbar(real, meta, w=120, h=80):
+    p = min(pct(real, meta), 100)
     color_arc = "#1a8a8a" if p >= 100 else "#0b3d91"
     fig = go.Figure(go.Pie(
         values=[p, 100-p],
@@ -263,156 +266,159 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# ─── KPI TOP ROW ─────────────────────────────────────────────────────────────
-c1, c2, c3, c4, c5 = st.columns(5)
+# ─── KPI TOP ROW (Layout reestruturado) ─────────────────────────────────────
+# Usamos um container para garantir que os cards se ajustem bem
+with st.container():
+    col1, col2, col3, col4, col5 = st.columns(5)
+    
+    with col1:
+        st.markdown(f"""
+        <div class="kpi-card good">
+          <div class="kpi-card-label">🏛️ Açudes Monitorados</div>
+          <div class="kpi-card-value good">{total_acudes}</div>
+          <div class="kpi-card-sub">GR Litoral / Itapipoca</div>
+        </div>""", unsafe_allow_html=True)
+    
+    with col2:
+        st.markdown(f"""
+        <div class="kpi-card">
+          <div class="kpi-card-label">💧 Volume Total (hm³)</div>
+          <div class="kpi-card-value">{total_vol:.2f}</div>
+          <div class="kpi-card-sub">Volume atual armazenado</div>
+        </div>""", unsafe_allow_html=True)
+    
+    with col3:
+        st.markdown(f"""
+        <div class="kpi-card good">
+          <div class="kpi-card-label">✅ Acima de 90% cap.</div>
+          <div class="kpi-card-value good">{n_acima90}</div>
+          <div class="kpi-card-sub">{n_acima90/total_acudes*100:.1f}% do total</div>
+        </div>""", unsafe_allow_html=True)
+    
+    with col4:
+        st.markdown(f"""
+        <div class="kpi-card">
+          <div class="kpi-card-label">〰️ Entre 10% e 90%</div>
+          <div class="kpi-card-value">{n_entre10_90}</div>
+          <div class="kpi-card-sub">{n_entre10_90/total_acudes*100:.1f}% do total</div>
+        </div>""", unsafe_allow_html=True)
+    
+    with col5:
+        cls = "warn" if n_abaixo10 > 0 else ""
+        st.markdown(f"""
+        <div class="kpi-card {cls}">
+          <div class="kpi-card-label">⚠️ Abaixo de 10%</div>
+          <div class="kpi-card-value {cls}">{n_abaixo10}</div>
+          <div class="kpi-card-sub">{n_abaixo10/total_acudes*100:.1f}% do total</div>
+        </div>""", unsafe_allow_html=True)
 
-with c1:
-    st.markdown(f"""
-    <div class="kpi-card good">
-      <div class="kpi-card-label">🏛️ Açudes Monitorados</div>
-      <div class="kpi-card-value good">{total_acudes}</div>
-      <div class="kpi-card-sub">GR Litoral / Itapipoca</div>
-    </div>""", unsafe_allow_html=True)
-
-with c2:
-    st.markdown(f"""
-    <div class="kpi-card">
-      <div class="kpi-card-label">💧 Volume Total (hm³)</div>
-      <div class="kpi-card-value">{total_vol:.2f}</div>
-      <div class="kpi-card-sub">Volume atual armazenado</div>
-    </div>""", unsafe_allow_html=True)
-
-with c3:
-    st.markdown(f"""
-    <div class="kpi-card good">
-      <div class="kpi-card-label">✅ Acima de 90% cap.</div>
-      <div class="kpi-card-value good">{n_acima90}</div>
-      <div class="kpi-card-sub">{n_acima90/total_acudes*100:.1f}% do total</div>
-    </div>""", unsafe_allow_html=True)
-
-with c4:
-    st.markdown(f"""
-    <div class="kpi-card">
-      <div class="kpi-card-label">〰️ Entre 10% e 90%</div>
-      <div class="kpi-card-value">{n_entre10_90}</div>
-      <div class="kpi-card-sub">{n_entre10_90/total_acudes*100:.1f}% do total</div>
-    </div>""", unsafe_allow_html=True)
-
-with c5:
-    cls = "warn" if n_abaixo10 > 0 else ""
-    st.markdown(f"""
-    <div class="kpi-card {cls}">
-      <div class="kpi-card-label">⚠️ Abaixo de 10%</div>
-      <div class="kpi-card-value {cls}">{n_abaixo10}</div>
-      <div class="kpi-card-sub">{n_abaixo10/total_acudes*100:.1f}% do total</div>
-    </div>""", unsafe_allow_html=True)
-
-# ─── NÚCLEO DE GESTÃO ────────────────────────────────────────────────────────
+# ─── NÚCLEO DE GESTÃO (Layout reestruturado) ─────────────────────────────────
 st.markdown('<div class="section-header">👥 NÚCLEO DE GESTÃO</div>', unsafe_allow_html=True)
 
-cols_g = st.columns(7)
-
+# Agrupamos os dados para facilitar a iteração
 gest_items = [
-    ("Alocações de Água",    gest["aloc_real"],  gest["aloc_meta"],  f"Meta: {gest['aloc_meta']} reuniões",   "reuniões", False),
-    ("Acompanhamento",       gest["acomp_real"], gest["acomp_meta"], f"Meta: {gest['acomp_meta']} reuniões",  "reuniões", False),
-    ("Avaliação",            gest["aval_real"],  gest["aval_meta"],  f"Meta: {gest['aval_meta']} reuniões",   "reuniões", False),
-    ("CBH Ordinária",        gest["cbh_ord_real"],gest["cbh_ord_meta"],f"Meta: {gest['cbh_ord_meta']} participantes","partic.", False),
-    ("CBH Extraordinária",   gest["cbh_ext_real"],gest["cbh_ext_meta"],f"Meta: {gest['cbh_ext_meta']} participantes","partic.", False),
-    ("CBH Fórum",            gest["cbh_for_real"],gest["cbh_for_meta"],f"Meta: {gest['cbh_for_meta']} reuniões","reuniões", False),
-    ("Capacitações",         gest["cap_real"],   gest["cap_meta"],   f"Meta: {gest['cap_meta']} capacitações", None, True),
+    ("Alocações de Água", gest["aloc_real"], gest["aloc_meta"], f"Meta: {gest['aloc_meta']} reuniões", "reuniões", False),
+    ("Acompanhamento", gest["acomp_real"], gest["acomp_meta"], f"Meta: {gest['acomp_meta']} reuniões", "reuniões", False),
+    ("Avaliação", gest["aval_real"], gest["aval_meta"], f"Meta: {gest['aval_meta']} reuniões", "reuniões", False),
+    ("CBH Ordinária", gest["cbh_ord_real"], gest["cbh_ord_meta"], f"Meta: {gest['cbh_ord_meta']} participantes", "partic.", False),
+    ("CBH Extraordinária", gest["cbh_ext_real"], gest["cbh_ext_meta"], f"Meta: {gest['cbh_ext_meta']} participantes", "partic.", False),
+    ("CBH Fórum", gest["cbh_for_real"], gest["cbh_for_meta"], f"Meta: {gest['cbh_for_meta']} reuniões", "reuniões", False),
+    ("Capacitações", gest["cap_real"], gest["cap_meta"], f"Meta: {gest['cap_meta']} capacitações", None, True),
 ]
-
 icons = ["🚰", "🔍", "📋", "👥", "👥", "🎓", "🎓"]
 
-for col, (label, real, meta, meta_txt, unit, is_count), icon in zip(cols_g, gest_items, icons):
-    p = pct(real, meta)
-    color_cls = "over" if p >= 100 else ""
-    with col:
-        if is_count:
-            st.markdown(f"""
-            <div class="ind-card">
-              <div class="ind-card-title">{icon} {label}</div>
-              <div class="ind-card-count">{real}</div>
-              {inline_bar(real, meta)}
-              <div class="ind-card-meta">{meta_txt}</div>
-            </div>""", unsafe_allow_html=True)
-        else:
-            fig = pbar(real, meta)
-            st.markdown(f'<div class="ind-card"><div class="ind-card-title">{icon} {label}</div>', unsafe_allow_html=True)
-            st.plotly_chart(fig, use_container_width=False, config={"displayModeBar": False}, key=f"gest_{label}")
-            st.markdown(f'<div class="ind-card-meta">{real} {unit if unit else ""} / {meta_txt}</div></div>', unsafe_allow_html=True)
+# Usamos um container e dividimos em 7 colunas para maior responsividade
+with st.container():
+    cols_g = st.columns(7)
+    for col, (label, real, meta, meta_txt, unit, is_count), icon in zip(cols_g, gest_items, icons):
+        with col:
+            if is_count:
+                st.markdown(f"""
+                <div class="ind-card">
+                  <div class="ind-card-title">{icon} {label}</div>
+                  <div class="ind-card-count">{real}</div>
+                  {inline_bar(real, meta)}
+                  <div class="ind-card-meta">{meta_txt}</div>
+                </div>""", unsafe_allow_html=True)
+            else:
+                fig = pbar(real, meta)
+                st.markdown(f'<div class="ind-card"><div class="ind-card-title">{icon} {label}</div>', unsafe_allow_html=True)
+                st.plotly_chart(fig, use_container_width=False, config={"displayModeBar": False}, key=f"gest_{label}")
+                st.markdown(f'<div class="ind-card-meta">{real} {unit if unit else ""} / {meta_txt}</div></div>', unsafe_allow_html=True)
 
-# ─── NÚCLEO DE OPERAÇÃO ──────────────────────────────────────────────────────
+# ─── NÚCLEO DE OPERAÇÃO (Layout reestruturado) ───────────────────────────────
 st.markdown('<div class="section-header">⚙️ NÚCLEO DE OPERAÇÃO</div>', unsafe_allow_html=True)
 
-cols_o = st.columns(5)
+# Organizamos os cards em 5 colunas
+with st.container():
+    cols_o = st.columns(5)
+    
+    # Anomalias
+    with cols_o[0]:
+        p = pct(oper["anom_real"], oper["anom_meta"])
+        fig = pbar(oper["anom_real"], oper["anom_meta"], w=130, h=88)
+        st.markdown('<div class="ind-card"><div class="ind-card-title">🛡️ Anomalias</div>', unsafe_allow_html=True)
+        st.plotly_chart(fig, use_container_width=False, config={"displayModeBar": False}, key="oper_anom")
+        st.markdown(f"""
+        <div class="ind-card-detail">
+          Regional: {oper['anom_real']} / {oper['anom_meta']} meta<br>
+          Corrigidas: {oper['anom_real']}
+        </div></div>""", unsafe_allow_html=True)
+    
+    # Regularização de Cobrança
+    with cols_o[1]:
+        fig = pbar(oper["cob_real"], oper["cob_meta"], w=130, h=88)
+        st.markdown('<div class="ind-card"><div class="ind-card-title">📃 Reg. Cobrança</div>', unsafe_allow_html=True)
+        st.plotly_chart(fig, use_container_width=False, config={"displayModeBar": False}, key="oper_cob")
+        st.markdown(f"""
+        <div class="ind-card-detail">
+          Novos: {12} | Inad.: {16}<br>
+          Real: {oper['cob_real']} / Meta: {oper['cob_meta']}
+        </div></div>""", unsafe_allow_html=True)
+    
+    # Fiscalização
+    with cols_o[2]:
+        fig = pbar(oper["fisc_real"], oper["fisc_meta"], w=130, h=88)
+        st.markdown('<div class="ind-card"><div class="ind-card-title">🔎 Fiscalização</div>', unsafe_allow_html=True)
+        st.plotly_chart(fig, use_container_width=False, config={"displayModeBar": False}, key="oper_fisc")
+        st.markdown(f"""
+        <div class="ind-card-detail">
+          Com RV: 13 | Sem RV: 38<br>
+          Real: {oper['fisc_real']} / Meta: {oper['fisc_meta']}
+        </div></div>""", unsafe_allow_html=True)
+    
+    # Medidores
+    with cols_o[3]:
+        avg_med = (pct(oper["med_man_real"], oper["med_man_meta"]) +
+                   pct(oper["med_inst_real"], oper["med_inst_meta"]) +
+                   pct(oper["med_med_real"], oper["med_med_meta"])) / 3
+        fig = pbar(avg_med, 100, w=130, h=88)
+        st.markdown('<div class="ind-card"><div class="ind-card-title">📡 Medidores</div>', unsafe_allow_html=True)
+        st.plotly_chart(fig, use_container_width=False, config={"displayModeBar": False}, key="oper_med")
+        st.markdown(f"""
+        <div class="ind-card-detail">
+          Manutenções: {oper['med_man_real']}/{oper['med_man_meta']}<br>
+          Instalações: {oper['med_inst_real']}/{oper['med_inst_meta']}<br>
+          Medições: {oper['med_med_real']}/{oper['med_med_meta']}
+        </div></div>""", unsafe_allow_html=True)
+    
+    # Batimetria
+    with cols_o[4]:
+        fig = pbar(oper["bati_real"], oper["bati_meta"], w=130, h=88)
+        st.markdown('<div class="ind-card"><div class="ind-card-title">🚢 Batimetria</div>', unsafe_allow_html=True)
+        st.plotly_chart(fig, use_container_width=False, config={"displayModeBar": False}, key="oper_bati")
+        st.markdown(f"""
+        <div class="ind-card-detail">
+          Realizadas: {oper['bati_real']} de {oper['bati_meta']}<br>
+          Meta: {oper['bati_meta']} batimetrias
+        </div></div>""", unsafe_allow_html=True)
 
-# Anomalias
-with cols_o[0]:
-    p = pct(oper["anom_real"], oper["anom_meta"])
-    fig = pbar(oper["anom_real"], oper["anom_meta"], w=130, h=88)
-    st.markdown('<div class="ind-card"><div class="ind-card-title">🛡️ Anomalias</div>', unsafe_allow_html=True)
-    st.plotly_chart(fig, use_container_width=False, config={"displayModeBar": False}, key="oper_anom")
-    st.markdown(f"""
-    <div class="ind-card-detail">
-      Regional: {oper['anom_real']} / {oper['anom_meta']} meta<br>
-      Corrigidas: {oper['anom_real']}
-    </div></div>""", unsafe_allow_html=True)
-
-# Regularização de Cobrança
-with cols_o[1]:
-    fig = pbar(oper["cob_real"], oper["cob_meta"], w=130, h=88)
-    st.markdown('<div class="ind-card"><div class="ind-card-title">📃 Reg. Cobrança</div>', unsafe_allow_html=True)
-    st.plotly_chart(fig, use_container_width=False, config={"displayModeBar": False}, key="oper_cob")
-    st.markdown(f"""
-    <div class="ind-card-detail">
-      Novos: {12} | Inad.: {16}<br>
-      Real: {oper['cob_real']} / Meta: {oper['cob_meta']}
-    </div></div>""", unsafe_allow_html=True)
-
-# Fiscalização
-with cols_o[2]:
-    fig = pbar(oper["fisc_real"], oper["fisc_meta"], w=130, h=88)
-    st.markdown('<div class="ind-card"><div class="ind-card-title">🔎 Fiscalização</div>', unsafe_allow_html=True)
-    st.plotly_chart(fig, use_container_width=False, config={"displayModeBar": False}, key="oper_fisc")
-    st.markdown(f"""
-    <div class="ind-card-detail">
-      Com RV: 13 | Sem RV: 38<br>
-      Real: {oper['fisc_real']} / Meta: {oper['fisc_meta']}
-    </div></div>""", unsafe_allow_html=True)
-
-# Medidores
-with cols_o[3]:
-    # Composite: average % of 3 sub-indicators
-    avg_med = (pct(oper["med_man_real"], oper["med_man_meta"]) +
-               pct(oper["med_inst_real"], oper["med_inst_meta"]) +
-               pct(oper["med_med_real"], oper["med_med_meta"])) / 3
-    fig = pbar(avg_med, 100, w=130, h=88)
-    st.markdown('<div class="ind-card"><div class="ind-card-title">📡 Medidores</div>', unsafe_allow_html=True)
-    st.plotly_chart(fig, use_container_width=False, config={"displayModeBar": False}, key="oper_med")
-    st.markdown(f"""
-    <div class="ind-card-detail">
-      Manutenções: {oper['med_man_real']}/{oper['med_man_meta']}<br>
-      Instalações: {oper['med_inst_real']}/{oper['med_inst_meta']}<br>
-      Medições: {oper['med_med_real']}/{oper['med_med_meta']}
-    </div></div>""", unsafe_allow_html=True)
-
-# Batimetria
-with cols_o[4]:
-    fig = pbar(oper["bati_real"], oper["bati_meta"], w=130, h=88)
-    st.markdown('<div class="ind-card"><div class="ind-card-title">🚢 Batimetria</div>', unsafe_allow_html=True)
-    st.plotly_chart(fig, use_container_width=False, config={"displayModeBar": False}, key="oper_bati")
-    st.markdown(f"""
-    <div class="ind-card-detail">
-      Realizadas: {oper['bati_real']} de {oper['bati_meta']}<br>
-      Meta: {oper['bati_meta']} batimetrias
-    </div></div>""", unsafe_allow_html=True)
-
-# ─── BOTTOM ROW: Açudes + Situação + Programação ────────────────────────────
+# ─── BOTTOM ROW: Açudes + Situação + Programação (Layout reestruturado) ─────
 st.markdown("<div style='margin-top:0.5rem'></div>", unsafe_allow_html=True)
+# Agora usamos um layout de 3 colunas, mas com proporções ajustadas para não quebrar
 col_ac, col_sit, col_prog = st.columns([2.2, 1.0, 1.8])
 
-# ── Açudes table ──
+# ── Açudes table (dentro do primeiro container) ──
 with col_ac:
     rows_html = ""
     for a in acudes:
@@ -441,7 +447,7 @@ with col_ac:
             </div>
           </td>
         </tr>"""
-
+    
     st.markdown(f"""
     <div class="acude-table-wrap">
       <div class="acude-table-title">🏛️ Situação dos Açudes (hm³ / % capacidade)</div>
