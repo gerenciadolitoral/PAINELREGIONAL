@@ -13,8 +13,6 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# ─── CSS ─────────────────────────────────────────────────────────────────────
-st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
@@ -36,16 +34,16 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     gap: 1.2rem;
     flex-wrap: wrap;
 }
-.header-logo { font-size: 3rem; }
-.header-title { color: #ffffff; font-size: 3rem; font-weight: 800; line-height: 1.15; margin: 0; }
-.header-sub { color: rgba(255,255,255,0.78); font-size: 1.5rem; margin-top: 0.2rem; }
+.header-logo { font-size: 3.3rem; }
+.header-title { color: #ffffff; font-size: 2.55rem; font-weight: 800; line-height: 1.15; margin: 0; }
+.header-sub { color: rgba(255,255,255,0.78); font-size: 1.23rem; margin-top: 0.2rem; }
 .header-date {
     margin-left: auto;
     background: rgba(255,255,255,0.15);
     border-radius: 8px;
     padding: 0.45rem 0.9rem;
     color: #ffffff;
-    font-size: 1,5rem;
+    font-size: 1.23rem;
     font-weight: 600;
     white-space: nowrap;
 }
@@ -54,7 +52,7 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 .section-header {
     background: linear-gradient(90deg, #0b3d91 0%, #1a8a8a 100%);
     color: #ffffff;
-    font-size: 1.5rem;
+    font-size: 1.32rem;
     font-weight: 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -80,11 +78,11 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 }
 .kpi-card.warn  { border-left-color: #e07b00; }
 .kpi-card.good  { border-left-color: #1a8a8a; }
-.kpi-card-label { font-size: 1.5rem; color: #5a6a7e; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem; }
-.kpi-card-value { font-size: 2.2rem; font-weight: 800; color: #0b3d91; line-height: 1.1; }
+.kpi-card-label { font-size: 1.11rem; color: #5a6a7e; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem; }
+.kpi-card-value { font-size: 2.55rem; font-weight: 800; color: #0b3d91; line-height: 1.1; }
 .kpi-card-value.warn { color: #e07b00; }
 .kpi-card-value.good { color: #1a8a8a; }
-.kpi-card-sub   { font-size: 1.5rem; color: #8a9ab0; margin-top: 0.2rem; }
+.kpi-card-sub   { font-size: 1.08rem; color: #8a9ab0; margin-top: 0.2rem; }
 
 /* Indicator cards — SELF-CONTAINED, no plotly inside */
 .ind-card {
@@ -101,7 +99,7 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     box-sizing: border-box;
 }
 .ind-card-title {
-    font-size: 1.5rem;
+    font-size: 1.035rem;
     font-weight: 700;
     color: #0b3d91;
     text-transform: uppercase;
@@ -109,8 +107,8 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     line-height: 1.3;
     width: 100%;
 }
-.ind-card-meta  { font-size: 1.5rem; color: #8a9ab0; }
-.ind-card-detail { font-size: 1.5rem; color: #5a6a7e; line-height: 1.5; width: 100%; }
+.ind-card-meta  { font-size: 1.02rem; color: #8a9ab0; }
+.ind-card-detail { font-size: 1.005rem; color: #5a6a7e; line-height: 1.5; width: 100%; }
 
 /* SVG donut inside card */
 .donut-wrap { width: 80px; height: 80px; flex-shrink: 0; }
@@ -122,7 +120,7 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     padding: 1rem 1.1rem;
     box-shadow: 0 2px 8px rgba(11,61,145,0.09);
 }
-.acude-table-title { font-size: 0.78rem; font-weight: 700; color: #0b3d91; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.7rem; }
+.acude-table-title { font-size: 1.17rem; font-weight: 700; color: #0b3d91; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.7rem; }
 
 /* Programação */
 .prog-card {
@@ -132,23 +130,22 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     box-shadow: 0 2px 8px rgba(11,61,145,0.09);
     height: 100%;
 }
-.prog-title { font-size: 0.78rem; font-weight: 700; color: #0b3d91; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.7rem; }
+.prog-title { font-size: 1.17rem; font-weight: 700; color: #0b3d91; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.7rem; }
 .prog-item {
     display: flex;
     align-items: flex-start;
     gap: 0.5rem;
     padding: 0.4rem 0;
     border-bottom: 1px solid #f0f4fa;
-    font-size: 0.8rem;
+    font-size: 1.2rem;
     color: #2d3a4a;
     line-height: 1.4;
 }
 .prog-item:last-child { border-bottom: none; }
-.prog-dot { color: #1a8a8a; font-size: 0.6rem; margin-top: 0.3rem; flex-shrink: 0; }
+.prog-dot { color: #1a8a8a; font-size: 0.9rem; margin-top: 0.3rem; flex-shrink: 0; }
 
 .js-plotly-plot .plotly .modebar { display: none !important; }
 </style>
-""", unsafe_allow_html=True)
 
 # ─── DATA ─────────────────────────────────────────────────────────────────────
 XLSX = Path(__file__).parent / "painel da grlitoral.xlsx"
