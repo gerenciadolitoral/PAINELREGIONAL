@@ -355,8 +355,7 @@ oper_items = [
     ("🔎 Fiscalização",  oper["fisc_real"],  oper["fisc_meta"],
      f"Com RV: 13 | Sem RV: 38<br>Real: {oper['fisc_real']}/{oper['fisc_meta']}"),
     ("📡 Medidores",     avg_med_pct,        100,
-     f"Manut.: {oper['med_man_real']}/{oper['med_man_meta']}<br>"
-     f"Inst.: {oper['med_inst_real']}/{oper['med_inst_meta']}<br>"
+     f"Manut.: {oper['med_man_real']}/{oper['med_man_meta']}<br> | Inst.: {oper['med_inst_real']}/{oper['med_inst_meta']}<br>"
      f"Med.: {oper['med_med_real']}/{oper['med_med_meta']}"),
     ("🚢 Batimetria",    oper["bati_real"],   oper["bati_meta"],
      f"Realizadas: {oper['bati_real']}/{oper['bati_meta']}"),
