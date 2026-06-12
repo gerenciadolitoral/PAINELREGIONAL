@@ -22,7 +22,7 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 
 /* Largura fixa do container — não varia com a tela */
 .block-container {
-    padding: 1rem 1.5rem 2rem 1.5rem !important;
+    padding: 1.5rem 1.5rem 2rem 1.5rem !important;
     max-width: 1400px !important;
     min-width: 1100px !important;
     width: 1400px !important;
