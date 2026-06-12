@@ -13,7 +13,11 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# ─── CSS ─────────────────────────────────────────────────────────────────────
+# ═══════════════════════════════════════════════════════════════════════════════
+# CSS — TODOS OS TAMANHOS DE FONTE ESTÃO AQUI
+# Unidade usada: rem (relativo ao root, ~16px). Exemplos:
+#   0.70rem ≈ 11px  |  0.80rem ≈ 13px  |  1.00rem = 16px  |  1.5rem ≈ 24px
+# ═══════════════════════════════════════════════════════════════════════════════
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
@@ -25,7 +29,7 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     max-width: 100% !important;
 }
 
-/* Header */
+/* ── HEADER ─────────────────────────────────────────────────────────────── */
 .header-banner {
     background: linear-gradient(135deg, #0b3d91 0%, #0d5fa6 40%, #1a8a8a 100%);
     border-radius: 0 0 16px 16px;
@@ -36,25 +40,43 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     gap: 1.2rem;
     flex-wrap: wrap;
 }
-.header-logo { font-size: 2.2rem; }
-.header-title { color: #ffffff; font-size: 1.7rem; font-weight: 800; line-height: 1.15; margin: 0; }
-.header-sub { color: rgba(255,255,255,0.78); font-size: 0.82rem; margin-top: 0.2rem; }
+
+/* ÍCONE EMOJI DO HEADER (💧) */
+.header-logo { font-size: 2.2rem; }        /* ← tamanho do ícone do header */
+
+/* TÍTULO PRINCIPAL DO HEADER */
+.header-title {
+    color: #ffffff;
+    font-size: 1.7rem;                     /* ← título "Dashboard Estratégico..." */
+    font-weight: 800;
+    line-height: 1.15;
+    margin: 0;
+}
+
+/* SUBTÍTULO DO HEADER */
+.header-sub {
+    color: rgba(255,255,255,0.78);
+    font-size: 0.82rem;                    /* ← subtítulo abaixo do título */
+    margin-top: 0.2rem;
+}
+
+/* DATA/COGERH NO CANTO DIREITO DO HEADER */
 .header-date {
     margin-left: auto;
     background: rgba(255,255,255,0.15);
     border-radius: 8px;
     padding: 0.45rem 0.9rem;
     color: #ffffff;
-    font-size: 0.82rem;
+    font-size: 0.82rem;                    /* ← "📅 DD/MM/AAAA | COGERH" */
     font-weight: 600;
     white-space: nowrap;
 }
 
-/* Section headers */
+/* ── CABEÇALHOS DE SEÇÃO ("NÚCLEO DE GESTÃO" / "NÚCLEO DE OPERAÇÃO") ──── */
 .section-header {
     background: linear-gradient(90deg, #0b3d91 0%, #1a8a8a 100%);
     color: #ffffff;
-    font-size: 0.88rem;
+    font-size: 0.88rem;                    /* ← texto dos banners de seção */
     font-weight: 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -66,7 +88,7 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     gap: 0.5rem;
 }
 
-/* KPI top row */
+/* ── CARDS KPI (FAIXA SUPERIOR: açudes, volume, etc.) ───────────────────── */
 .kpi-card {
     background: #ffffff;
     border-radius: 12px;
@@ -78,15 +100,37 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     flex-direction: column;
     justify-content: center;
 }
-.kpi-card.warn  { border-left-color: #e07b00; }
-.kpi-card.good  { border-left-color: #1a8a8a; }
-.kpi-card-label { font-size: 0.74rem; color: #5a6a7e; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem; }
-.kpi-card-value { font-size: 1.7rem; font-weight: 800; color: #0b3d91; line-height: 1.1; }
+.kpi-card.warn { border-left-color: #e07b00; }
+.kpi-card.good { border-left-color: #1a8a8a; }
+
+/* RÓTULO SUPERIOR DO CARD KPI (ex: "💧 VOLUME TOTAL (HM³)") */
+.kpi-card-label {
+    font-size: 0.74rem;                    /* ← rótulo/label dos cards KPI */
+    color: #5a6a7e;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.25rem;
+}
+
+/* VALOR NUMÉRICO GRANDE DO CARD KPI (ex: "168.47") */
+.kpi-card-value {
+    font-size: 1.7rem;                     /* ← número principal dos cards KPI */
+    font-weight: 800;
+    color: #0b3d91;
+    line-height: 1.1;
+}
 .kpi-card-value.warn { color: #e07b00; }
 .kpi-card-value.good { color: #1a8a8a; }
-.kpi-card-sub   { font-size: 0.72rem; color: #8a9ab0; margin-top: 0.2rem; }
 
-/* Indicator cards — SELF-CONTAINED, no plotly inside */
+/* TEXTO SECUNDÁRIO DO CARD KPI (ex: "Volume atual armazenado") */
+.kpi-card-sub {
+    font-size: 0.72rem;                    /* ← subtexto inferior dos cards KPI */
+    color: #8a9ab0;
+    margin-top: 0.2rem;
+}
+
+/* ── CARDS DE INDICADOR (gestão e operação, com donut SVG) ──────────────── */
 .ind-card {
     background: #ffffff;
     border-radius: 12px;
@@ -100,8 +144,10 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     height: 100%;
     box-sizing: border-box;
 }
+
+/* TÍTULO DO CARD DE INDICADOR (ex: "ALOCAÇÕES", "🛡️ ANOMALIAS") */
 .ind-card-title {
-    font-size: 0.69rem;
+    font-size: 0.69rem;                    /* ← rótulo/título dos cards de indicador */
     font-weight: 700;
     color: #0b3d91;
     text-transform: uppercase;
@@ -109,22 +155,34 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     line-height: 1.3;
     width: 100%;
 }
-.ind-card-meta  { font-size: 0.68rem; color: #8a9ab0; }
-.ind-card-detail { font-size: 0.67rem; color: #5a6a7e; line-height: 1.5; width: 100%; }
 
-/* SVG donut inside card */
-.donut-wrap { width: 80px; height: 80px; flex-shrink: 0; }
+/* TEXTO AUXILIAR DOS CARDS DE INDICADOR (linha abaixo do donut) */
+.ind-card-detail {
+    font-size: 0.67rem;                    /* ← detalhe/legenda abaixo do donut */
+    color: #5a6a7e;
+    line-height: 1.5;
+    width: 100%;
+}
 
-/* Açudes table */
+/* ── TABELA DE AÇUDES ────────────────────────────────────────────────────── */
 .acude-table-wrap {
     background: #ffffff;
     border-radius: 12px;
     padding: 1rem 1.1rem;
     box-shadow: 0 2px 8px rgba(11,61,145,0.09);
 }
-.acude-table-title { font-size: 0.78rem; font-weight: 700; color: #0b3d91; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.7rem; }
 
-/* Programação */
+/* TÍTULO DA TABELA DE AÇUDES */
+.acude-table-title {
+    font-size: 0.78rem;                    /* ← "🏛️ SITUAÇÃO DOS AÇUDES..." */
+    font-weight: 700;
+    color: #0b3d91;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.7rem;
+}
+
+/* ── CARD DE PROGRAMAÇÃO ─────────────────────────────────────────────────── */
 .prog-card {
     background: #ffffff;
     border-radius: 12px;
@@ -132,34 +190,65 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     box-shadow: 0 2px 8px rgba(11,61,145,0.09);
     height: 100%;
 }
-.prog-title { font-size: 0.78rem; font-weight: 700; color: #0b3d91; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.7rem; }
+
+/* TÍTULO DO CARD DE PROGRAMAÇÃO */
+.prog-title {
+    font-size: 0.78rem;                    /* ← "📅 PROGRAMAÇÃO — DD/MM/AAAA" */
+    font-weight: 700;
+    color: #0b3d91;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.7rem;
+}
+
+/* CADA ITEM DA LISTA DE PROGRAMAÇÃO */
 .prog-item {
     display: flex;
     align-items: flex-start;
     gap: 0.5rem;
     padding: 0.4rem 0;
     border-bottom: 1px solid #f0f4fa;
-    font-size: 0.8rem;
+    font-size: 0.8rem;                     /* ← texto de cada tarefa da programação */
     color: #2d3a4a;
     line-height: 1.4;
 }
 .prog-item:last-child { border-bottom: none; }
-.prog-dot { color: #1a8a8a; font-size: 0.6rem; margin-top: 0.3rem; flex-shrink: 0; }
+
+/* ÍCONE BULLET DA PROGRAMAÇÃO (●) */
+.prog-dot {
+    color: #1a8a8a;
+    font-size: 0.6rem;                     /* ← tamanho do ponto ● da programação */
+    margin-top: 0.3rem;
+    flex-shrink: 0;
+}
 
 .js-plotly-plot .plotly .modebar { display: none !important; }
 </style>
 """, unsafe_allow_html=True)
 
 # ─── DATA ─────────────────────────────────────────────────────────────────────
-XLSX = Path(__file__).parent / "painel da grlitoral.xlsx"
+SHEET_ID = "1kte6Ys9vgzw7a0Z1PDXkxf6VOX9KHWlRCXp7P-7RSi4"
+
+GID_METAS = 0
+GID_ACUDES = 534264164
 
 @st.cache_data(ttl=300)
 def load_data():
-    df_m = pd.read_excel(XLSX, sheet_name="metas",  header=None)
-    df_a = pd.read_excel(XLSX, sheet_name="açudes", header=None)
-    return df_m, df_a
 
-df_metas, df_acudes = load_data()
+    url_metas = (
+        f"https://docs.google.com/spreadsheets/d/{SHEET_ID}"
+        f"/export?format=csv&gid={GID_METAS}"
+    )
+
+    url_acudes = (
+        f"https://docs.google.com/spreadsheets/d/{SHEET_ID}"
+        f"/export?format=csv&gid={GID_ACUDES}"
+    )
+
+    df_m = pd.read_csv(url_metas, header=None)
+    df_a = pd.read_csv(url_acudes, header=None)
+
+    return df_m, df_a
 
 gest = dict(
     cbh_ord_meta=160, cbh_ord_real=34,
@@ -209,16 +298,23 @@ def pct(real, meta):
     return round(real / meta * 100, 1)
 
 def svg_donut(real, meta, size=80):
-    """Gera um mini donut SVG completamente autocontido — sem Plotly."""
+    """
+    Mini donut SVG autocontido.
+    ┌─ AJUSTES DO DONUT ───────────────────────────────────────────────────┐
+    │  size     → tamanho total do SVG em px (padrão: 80)                  │
+    │  r        → raio do arco (padrão: 30). Aumente para donut maior.     │
+    │  stroke_w → espessura do anel (padrão: 9)                            │
+    │  font-size no <text> abaixo → tamanho do % central do donut         │
+    └──────────────────────────────────────────────────────────────────────┘
+    """
     p = min(pct(real, meta), 100)
     color = "#1a8a8a" if p >= 100 else "#0b3d91"
-    r = 30
+    r = 30           # ← raio do donut (px dentro do viewBox)
     cx = cy = size / 2
-    stroke_w = 9
+    stroke_w = 9     # ← espessura do anel do donut
     circumference = 2 * math.pi * r
     dash = circumference * p / 100
     gap  = circumference - dash
-    # Começa no topo: rotate -90
     return f"""
 <svg width="{size}" height="{size}" viewBox="0 0 {size} {size}" xmlns="http://www.w3.org/2000/svg">
   <circle cx="{cx}" cy="{cy}" r="{r}" fill="none" stroke="#e8f0fb" stroke-width="{stroke_w}"/>
@@ -227,7 +323,9 @@ def svg_donut(real, meta, size=80):
           stroke-linecap="round"
           transform="rotate(-90 {cx} {cy})"/>
   <text x="{cx}" y="{cy}" text-anchor="middle" dominant-baseline="central"
-        font-family="Inter,sans-serif" font-size="12" font-weight="800" fill="{color}">{p:.0f}%</text>
+        font-family="Inter,sans-serif"
+        font-size="12"              <!-- ← tamanho do % dentro do donut (px SVG) -->
+        font-weight="800" fill="{color}">{p:.0f}%</text>
 </svg>"""
 
 # ─── HEADER ───────────────────────────────────────────────────────────────────
@@ -286,13 +384,13 @@ with col5:
 st.markdown('<div class="section-header">👥 NÚCLEO DE GESTÃO</div>', unsafe_allow_html=True)
 
 gest_items = [
-    ("Alocações",       gest["aloc_real"],    gest["aloc_meta"],    f"{gest['aloc_real']}/{gest['aloc_meta']} reuniões"),
-    ("Acompanhamento",  gest["acomp_real"],   gest["acomp_meta"],   f"{gest['acomp_real']}/{gest['acomp_meta']} reuniões"),
-    ("Avaliação",       gest["aval_real"],    gest["aval_meta"],    f"{gest['aval_real']}/{gest['aval_meta']} reuniões"),
-    ("CBH Ordinária",   gest["cbh_ord_real"], gest["cbh_ord_meta"], f"{gest['cbh_ord_real']}/{gest['cbh_ord_meta']} partic."),
-    ("CBH Extraord.",   gest["cbh_ext_real"], gest["cbh_ext_meta"], f"{gest['cbh_ext_real']}/{gest['cbh_ext_meta']} partic."),
-    ("CBH Fórum",       gest["cbh_for_real"], gest["cbh_for_meta"], f"{gest['cbh_for_real']}/{gest['cbh_for_meta']} reuniões"),
-    ("Capacitações",    gest["cap_real"],     gest["cap_meta"],     f"{gest['cap_real']}/{gest['cap_meta']} capacit."),
+    ("Alocações",      gest["aloc_real"],    gest["aloc_meta"],    f"{gest['aloc_real']}/{gest['aloc_meta']} reuniões"),
+    ("Acompanhamento", gest["acomp_real"],   gest["acomp_meta"],   f"{gest['acomp_real']}/{gest['acomp_meta']} reuniões"),
+    ("Avaliação",      gest["aval_real"],    gest["aval_meta"],    f"{gest['aval_real']}/{gest['aval_meta']} reuniões"),
+    ("CBH Ordinária",  gest["cbh_ord_real"], gest["cbh_ord_meta"], f"{gest['cbh_ord_real']}/{gest['cbh_ord_meta']} partic."),
+    ("CBH Extraord.",  gest["cbh_ext_real"], gest["cbh_ext_meta"], f"{gest['cbh_ext_real']}/{gest['cbh_ext_meta']} partic."),
+    ("CBH Fórum",      gest["cbh_for_real"], gest["cbh_for_meta"], f"{gest['cbh_for_real']}/{gest['cbh_for_meta']} reuniões"),
+    ("Capacitações",   gest["cap_real"],     gest["cap_meta"],     f"{gest['cap_real']}/{gest['cap_meta']} capacit."),
 ]
 
 cols_g = st.columns(7)
@@ -309,33 +407,28 @@ for col, (label, real, meta, detail) in zip(cols_g, gest_items):
 # ─── NÚCLEO DE OPERAÇÃO ───────────────────────────────────────────────────────
 st.markdown('<div class="section-header">⚙️ NÚCLEO DE OPERAÇÃO</div>', unsafe_allow_html=True)
 
-# Medidores: média das 3 metas
 avg_med_pct = (pct(oper["med_man_real"], oper["med_man_meta"]) +
                pct(oper["med_inst_real"], oper["med_inst_meta"]) +
                pct(oper["med_med_real"],  oper["med_med_meta"])) / 3
 
 oper_items = [
-    ("🛡️ Anomalias",     oper["anom_real"],  oper["anom_meta"],
+    ("🛡️ Anomalias",     oper["anom_real"], oper["anom_meta"],
      f"Regional: {oper['anom_real']}/{oper['anom_meta']}<br>Corrigidas: {oper['anom_real']}"),
-    ("📃 Reg. Cobrança", oper["cob_real"],   oper["cob_meta"],
+    ("📃 Reg. Cobrança", oper["cob_real"],  oper["cob_meta"],
      f"Novos: 12 | Inad.: 16<br>Real: {oper['cob_real']}/{oper['cob_meta']}"),
-    ("🔎 Fiscalização",  oper["fisc_real"],  oper["fisc_meta"],
+    ("🔎 Fiscalização",  oper["fisc_real"], oper["fisc_meta"],
      f"Com RV: 13 | Sem RV: 38<br>Real: {oper['fisc_real']}/{oper['fisc_meta']}"),
-    ("📡 Medidores",     avg_med_pct,        100,
+    ("📡 Medidores",     avg_med_pct,       100,
      f"Manut.: {oper['med_man_real']}/{oper['med_man_meta']}<br>"
      f"Inst.: {oper['med_inst_real']}/{oper['med_inst_meta']}<br>"
      f"Med.: {oper['med_med_real']}/{oper['med_med_meta']}"),
-    ("🚢 Batimetria",    oper["bati_real"],   oper["bati_meta"],
+    ("🚢 Batimetria",    oper["bati_real"], oper["bati_meta"],
      f"Realizadas: {oper['bati_real']}/{oper['bati_meta']}"),
 ]
 
 cols_o = st.columns(5)
 for col, (label, real, meta, detail) in zip(cols_o, oper_items):
-    # Para medidores o real já é pct, passamos diretamente
-    if label == "📡 Medidores":
-        donut = svg_donut(real, meta)  # real=avg_pct, meta=100
-    else:
-        donut = svg_donut(real, meta)
+    donut = svg_donut(real, meta)
     with col:
         st.markdown(f"""
         <div class="ind-card">
@@ -348,7 +441,7 @@ for col, (label, real, meta, detail) in zip(cols_o, oper_items):
 st.markdown("<div style='margin-top:0.5rem'></div>", unsafe_allow_html=True)
 col_ac, col_sit, col_prog = st.columns([2.2, 1.0, 1.8])
 
-# Tabela de açudes
+# ── Tabela de açudes ──────────────────────────────────────────────────────────
 with col_ac:
     rows_html = ""
     for a in acudes:
@@ -362,35 +455,51 @@ with col_ac:
         w = min(pct_val, 100)
         rows_html += f"""
         <tr style="border-bottom:1px solid #f0f4fa;">
-          <td style="padding:0.35rem 0.5rem;font-size:0.78rem;font-weight:600;color:#0d1b2a">{dot} {a['nome']}</td>
-          <td style="padding:0.35rem 0.5rem;font-size:0.75rem;color:#5a6a7e">{a['municipio']}</td>
-          <td style="padding:0.35rem 0.5rem;font-size:0.78rem;font-weight:600;color:#0b3d91;text-align:right">{a['vol']:.2f}</td>
+          <td style="padding:0.35rem 0.5rem;
+                     font-size:0.78rem;        /* ← nome do açude na tabela */
+                     font-weight:600;color:#0d1b2a">{dot} {a['nome']}</td>
+          <td style="padding:0.35rem 0.5rem;
+                     font-size:0.75rem;        /* ← município na tabela */
+                     color:#5a6a7e">{a['municipio']}</td>
+          <td style="padding:0.35rem 0.5rem;
+                     font-size:0.78rem;        /* ← valor hm³ na tabela */
+                     font-weight:600;color:#0b3d91;text-align:right">{a['vol']:.2f}</td>
           <td style="padding:0.35rem 0.5rem;width:120px">
             <div style="display:flex;align-items:center;gap:0.4rem">
               <div style="flex:1;background:#e8f0fb;border-radius:3px;height:7px;overflow:hidden">
                 <div style="width:{w}%;height:100%;background:{bar_color};border-radius:3px"></div>
               </div>
-              <span style="font-size:0.75rem;font-weight:700;color:{bar_color};white-space:nowrap">{pct_val:.1f}%</span>
+              <span style="font-size:0.75rem;  /* ← percentual % na tabela */
+                           font-weight:700;color:{bar_color};white-space:nowrap">{pct_val:.1f}%</span>
             </div>
           </td>
         </tr>"""
+
     st.markdown(f"""
     <div class="acude-table-wrap">
       <div class="acude-table-title">🏛️ Situação dos Açudes (hm³ / % capacidade)</div>
       <table style="width:100%;border-collapse:collapse">
         <thead>
           <tr style="background:#f5f8ff">
-            <th style="padding:0.3rem 0.5rem;font-size:0.7rem;text-align:left;color:#5a6a7e;font-weight:700">AÇUDE</th>
-            <th style="padding:0.3rem 0.5rem;font-size:0.7rem;text-align:left;color:#5a6a7e;font-weight:700">MUNICÍPIO</th>
-            <th style="padding:0.3rem 0.5rem;font-size:0.7rem;text-align:right;color:#5a6a7e;font-weight:700">hm³</th>
-            <th style="padding:0.3rem 0.5rem;font-size:0.7rem;color:#5a6a7e;font-weight:700">% CAP.</th>
+            <th style="padding:0.3rem 0.5rem;
+                       font-size:0.7rem;       /* ← cabeçalho col AÇUDE */
+                       text-align:left;color:#5a6a7e;font-weight:700">AÇUDE</th>
+            <th style="padding:0.3rem 0.5rem;
+                       font-size:0.7rem;       /* ← cabeçalho col MUNICÍPIO */
+                       text-align:left;color:#5a6a7e;font-weight:700">MUNICÍPIO</th>
+            <th style="padding:0.3rem 0.5rem;
+                       font-size:0.7rem;       /* ← cabeçalho col hm³ */
+                       text-align:right;color:#5a6a7e;font-weight:700">hm³</th>
+            <th style="padding:0.3rem 0.5rem;
+                       font-size:0.7rem;       /* ← cabeçalho col % CAP. */
+                       color:#5a6a7e;font-weight:700">% CAP.</th>
           </tr>
         </thead>
         <tbody>{rows_html}</tbody>
       </table>
     </div>""", unsafe_allow_html=True)
 
-# Donut de situação — Plotly correto: dentro de um único st.plotly_chart
+# ── Donut situação dos açudes (Plotly) ───────────────────────────────────────
 with col_sit:
     fig_sit = go.Figure(go.Pie(
         labels=["Acima de 90%", "Entre 10–90%", "Abaixo de 10%"],
@@ -403,7 +512,11 @@ with col_sit:
     fig_sit.add_annotation(
         text=f"<b>{total_acudes}</b><br><span style='font-size:9px'>açudes</span>",
         x=0.5, y=0.5, showarrow=False,
-        font=dict(size=16, color="#0b3d91", family="Inter"),
+        font=dict(
+            size=16,            # ← número total no centro do donut grande
+            color="#0b3d91",
+            family="Inter"
+        ),
     )
     fig_sit.update_layout(
         margin=dict(l=8, r=8, t=36, b=8),
@@ -412,13 +525,20 @@ with col_sit:
             orientation="v",
             x=0.5, xanchor="center",
             y=-0.12,
-            font=dict(size=10, family="Inter"),
+            font=dict(
+                size=10,        # ← legenda do donut grande (Acima 90%, etc.)
+                family="Inter"
+            ),
         ),
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
         title=dict(
             text="Situação dos Açudes",
-            font=dict(size=11, color="#0b3d91", family="Inter"),
+            font=dict(
+                size=11,        # ← título acima do donut grande
+                color="#0b3d91",
+                family="Inter"
+            ),
             x=0.5,
         ),
         height=300,
@@ -427,7 +547,7 @@ with col_sit:
     st.plotly_chart(fig_sit, use_container_width=True, config={"displayModeBar": False}, key="donut_sit")
     st.markdown('</div>', unsafe_allow_html=True)
 
-# Programação
+# ── Programação ───────────────────────────────────────────────────────────────
 with col_prog:
     items_html = "".join(
         f'<div class="prog-item"><span class="prog-dot">●</span><span>{t}</span></div>'
@@ -441,7 +561,8 @@ with col_prog:
 
 # ─── FOOTER ───────────────────────────────────────────────────────────────────
 st.markdown("""
-<div style="text-align:center;margin-top:1.5rem;color:#8a9ab0;font-size:0.72rem">
+<div style="text-align:center;margin-top:1.5rem;color:#8a9ab0;
+            font-size:0.72rem">    <!-- ← texto do rodapé -->
   COGERH – Companhia de Gestão dos Recursos Hídricos &nbsp;|&nbsp; GR Litoral / Itapipoca &nbsp;|&nbsp;
   Dados: painel_da_grlitoral.xlsx
 </div>""", unsafe_allow_html=True)
