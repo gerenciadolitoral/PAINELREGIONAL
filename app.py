@@ -36,16 +36,16 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     gap: 1.2rem;
     flex-wrap: wrap;
 }
-.header-logo { font-size: 3.3rem; }
-.header-title { color: #ffffff; font-size: 2.55rem; font-weight: 800; line-height: 1.15; margin: 0; }
-.header-sub { color: rgba(255,255,255,0.78); font-size: 1.23rem; margin-top: 0.2rem; }
+.header-logo { font-size: 2.97rem; }
+.header-title { color: #ffffff; font-size: 2.295rem; font-weight: 800; line-height: 1.15; margin: 0; }
+.header-sub { color: rgba(255,255,255,0.78); font-size: 1.107rem; margin-top: 0.2rem; }
 .header-date {
     margin-left: auto;
     background: rgba(255,255,255,0.15);
     border-radius: 8px;
     padding: 0.45rem 0.9rem;
     color: #ffffff;
-    font-size: 1.23rem;
+    font-size: 1.107rem;
     font-weight: 600;
     white-space: nowrap;
 }
@@ -54,7 +54,7 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 .section-header {
     background: linear-gradient(90deg, #0b3d91 0%, #1a8a8a 100%);
     color: #ffffff;
-    font-size: 1.32rem;
+    font-size: 1.188rem;
     font-weight: 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -73,18 +73,18 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     padding: 1rem 1.1rem;
     box-shadow: 0 2px 8px rgba(11,61,145,0.10);
     border-left: 4px solid #0b3d91;
-    min-height: 135px;
+    min-height: 90px;
     display: flex;
     flex-direction: column;
     justify-content: center;
 }
 .kpi-card.warn  { border-left-color: #e07b00; }
 .kpi-card.good  { border-left-color: #1a8a8a; }
-.kpi-card-label { font-size: 1.11rem; color: #5a6a7e; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem; }
-.kpi-card-value { font-size: 2.55rem; font-weight: 800; color: #0b3d91; line-height: 1.1; }
+.kpi-card-label { font-size: 0.999rem; color: #5a6a7e; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem; }
+.kpi-card-value { font-size: 2.295rem; font-weight: 800; color: #0b3d91; line-height: 1.1; }
 .kpi-card-value.warn { color: #e07b00; }
 .kpi-card-value.good { color: #1a8a8a; }
-.kpi-card-sub   { font-size: 1.08rem; color: #8a9ab0; margin-top: 0.2rem; }
+.kpi-card-sub   { font-size: 0.792rem; color: #8a9ab0; margin-top: 0.2rem; }
 
 /* Indicator cards — SELF-CONTAINED, no plotly inside */
 .ind-card {
@@ -101,7 +101,7 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     box-sizing: border-box;
 }
 .ind-card-title {
-    font-size: 1.04rem;
+    font-size: 0.932rem;
     font-weight: 700;
     color: #0b3d91;
     text-transform: uppercase;
@@ -109,11 +109,11 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     line-height: 1.3;
     width: 100%;
 }
-.ind-card-meta  { font-size: 1.02rem; color: #8a9ab0; }
-.ind-card-detail { font-size: 1.01rem; color: #5a6a7e; line-height: 1.5; width: 100%; }
+.ind-card-meta  { font-size: 0.68rem; color: #8a9ab0; }
+.ind-card-detail { font-size: 0.905rem; color: #5a6a7e; line-height: 1.5; width: 100%; }
 
 /* SVG donut inside card */
-.donut-wrap { width: 120px; height: 120px; flex-shrink: 0; }
+.donut-wrap { width: 80px; height: 80px; flex-shrink: 0; }
 
 /* Açudes table */
 .acude-table-wrap {
@@ -122,7 +122,7 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     padding: 1rem 1.1rem;
     box-shadow: 0 2px 8px rgba(11,61,145,0.09);
 }
-.acude-table-title { font-size: 1.17rem; font-weight: 700; color: #0b3d91; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.7rem; }
+.acude-table-title { font-size: 1.053rem; font-weight: 700; color: #0b3d91; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.7rem; }
 
 /* Programação */
 .prog-card {
@@ -132,19 +132,19 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     box-shadow: 0 2px 8px rgba(11,61,145,0.09);
     height: 100%;
 }
-.prog-title { font-size: 1.17rem; font-weight: 700; color: #0b3d91; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.7rem; }
+.prog-title { font-size: 1.053rem; font-weight: 700; color: #0b3d91; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.7rem; }
 .prog-item {
     display: flex;
     align-items: flex-start;
     gap: 0.5rem;
     padding: 0.4rem 0;
     border-bottom: 1px solid #f0f4fa;
-    font-size: 1.2rem;
+    font-size: 0.88rem;
     color: #2d3a4a;
     line-height: 1.4;
 }
 .prog-item:last-child { border-bottom: none; }
-.prog-dot { color: #1a8a8a; font-size: 0.9rem; margin-top: 0.3rem; flex-shrink: 0; }
+.prog-dot { color: #1a8a8a; font-size: 0.81rem; margin-top: 0.3rem; flex-shrink: 0; }
 
 .js-plotly-plot .plotly .modebar { display: none !important; }
 </style>
@@ -227,7 +227,7 @@ def svg_donut(real, meta, size=80):
           stroke-linecap="round"
           transform="rotate(-90 {cx} {cy})"/>
   <text x="{cx}" y="{cy}" text-anchor="middle" dominant-baseline="central"
-        font-family="Inter,sans-serif" font-size="12" font-weight="800" fill="{color}">{p:.0f}%</text>
+        font-family="Inter,sans-serif" font-size="16.2" font-weight="800" fill="{color}">{p:.0f}%</text>
 </svg>"""
 
 # ─── HEADER ───────────────────────────────────────────────────────────────────
@@ -403,7 +403,7 @@ with col_sit:
     fig_sit.add_annotation(
         text=f"<b>{total_acudes}</b><br><span style='font-size:9px'>açudes</span>",
         x=0.5, y=0.5, showarrow=False,
-        font=dict(size=16, color="#0b3d91", family="Inter"),
+        font=dict(size=24, color="#0b3d91", family="Inter"),
     )
     fig_sit.update_layout(
         margin=dict(l=8, r=8, t=36, b=8),
@@ -412,13 +412,13 @@ with col_sit:
             orientation="v",
             x=0.5, xanchor="center",
             y=-0.12,
-            font=dict(size=10, family="Inter"),
+            font=dict(size=11, family="Inter"),
         ),
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
         title=dict(
             text="Situação dos Açudes",
-            font=dict(size=11, color="#0b3d91", family="Inter"),
+            font=dict(size=14.85, color="#0b3d91", family="Inter"),
             x=0.5,
         ),
         height=300,
