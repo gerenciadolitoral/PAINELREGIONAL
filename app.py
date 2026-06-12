@@ -440,7 +440,7 @@ with col_sit:
         showlegend=True,
         legend=dict(
             orientation="v",
-            x=0.5, xanchor="left",
+            x=0.5, xanchor="right",
             y=-0.18,
             font=dict(size=10, family="Inter"),
             itemsizing="constant",
