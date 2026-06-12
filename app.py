@@ -229,8 +229,8 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 # ─── DATA ─────────────────────────────────────────────────────────────────────
 SHEET_ID = "1kte6Ys9vgzw7a0Z1PDXkxf6VOX9KHWlRCXp7P-7RSi4"
 
-GID_METAS = 0
-GID_ACUDES = 534264164
+GID_METAS = "0"
+GID_ACUDES = "534264164"
 
 @st.cache_data(ttl=300)
 def load_data():
