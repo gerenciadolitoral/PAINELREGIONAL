@@ -13,6 +13,8 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
+# ─── CSS ─────────────────────────────────────────────────────────────────────
+st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
@@ -71,7 +73,7 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     padding: 1rem 1.1rem;
     box-shadow: 0 2px 8px rgba(11,61,145,0.10);
     border-left: 4px solid #0b3d91;
-    min-height: 90px;
+    min-height: 135px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -99,7 +101,7 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     box-sizing: border-box;
 }
 .ind-card-title {
-    font-size: 1.035rem;
+    font-size: 1.04rem;
     font-weight: 700;
     color: #0b3d91;
     text-transform: uppercase;
@@ -108,10 +110,10 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     width: 100%;
 }
 .ind-card-meta  { font-size: 1.02rem; color: #8a9ab0; }
-.ind-card-detail { font-size: 1.005rem; color: #5a6a7e; line-height: 1.5; width: 100%; }
+.ind-card-detail { font-size: 1.01rem; color: #5a6a7e; line-height: 1.5; width: 100%; }
 
 /* SVG donut inside card */
-.donut-wrap { width: 80px; height: 80px; flex-shrink: 0; }
+.donut-wrap { width: 120px; height: 120px; flex-shrink: 0; }
 
 /* Açudes table */
 .acude-table-wrap {
@@ -146,6 +148,7 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 
 .js-plotly-plot .plotly .modebar { display: none !important; }
 </style>
+""", unsafe_allow_html=True)
 
 # ─── DATA ─────────────────────────────────────────────────────────────────────
 XLSX = Path(__file__).parent / "painel da grlitoral.xlsx"
@@ -224,7 +227,7 @@ def svg_donut(real, meta, size=80):
           stroke-linecap="round"
           transform="rotate(-90 {cx} {cy})"/>
   <text x="{cx}" y="{cy}" text-anchor="middle" dominant-baseline="central"
-        font-family="Inter,sans-serif" font-size="18" font-weight="800" fill="{color}">{p:.0f}%</text>
+        font-family="Inter,sans-serif" font-size="12" font-weight="800" fill="{color}">{p:.0f}%</text>
 </svg>"""
 
 # ─── HEADER ───────────────────────────────────────────────────────────────────
