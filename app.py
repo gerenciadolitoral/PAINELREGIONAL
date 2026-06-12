@@ -249,7 +249,7 @@ def svg_donut(real, meta, size=80):
     color = "#1a8a8a" if p >= 100 else "#0b3d91"
     r = 30
     cx = cy = size / 2
-    stroke_w = 9
+    stroke_w = 12
     circumference = 2 * math.pi * r
     dash = circumference * p / 100
     gap  = circumference - dash
@@ -440,7 +440,7 @@ with col_sit:
         showlegend=True,
         legend=dict(
             orientation="v",
-            x=0.5, xanchor="center",
+            x=0.5, xanchor="left",
             y=-0.18,
             font=dict(size=10, family="Inter"),
             itemsizing="constant",
