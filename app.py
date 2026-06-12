@@ -227,28 +227,15 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 """, unsafe_allow_html=True)
 
 # ─── DATA ─────────────────────────────────────────────────────────────────────
-SHEET_ID = "1kte6Ys9vgzw7a0Z1PDXkxf6VOX9KHWlRCXp7P-7RSi4"
-
-GID_METAS = "0"
-GID_ACUDES = "534264164"
+XLSX = Path(__file__).parent / "painel da grlitoral.xlsx"
 
 @st.cache_data(ttl=300)
 def load_data():
-
-    url_metas = (
-        f"https://docs.google.com/spreadsheets/d/{SHEET_ID}"
-        f"/export?format=csv&gid={GID_METAS}"
-    )
-
-    url_acudes = (
-        f"https://docs.google.com/spreadsheets/d/{SHEET_ID}"
-        f"/export?format=csv&gid={GID_ACUDES}"
-    )
-
-    df_m = pd.read_csv(url_metas, header=None)
-    df_a = pd.read_csv(url_acudes, header=None)
-
+    df_m = pd.read_excel(XLSX, sheet_name="metas",  header=None)
+    df_a = pd.read_excel(XLSX, sheet_name="açudes", header=None)
     return df_m, df_a
+
+df_metas, df_acudes = load_data()
 
 gest = dict(
     cbh_ord_meta=160, cbh_ord_real=34,
