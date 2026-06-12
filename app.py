@@ -320,13 +320,13 @@ with col5:
 st.markdown('<div class="section-header">👥 NÚCLEO DE GESTÃO</div>', unsafe_allow_html=True)
 
 gest_items = [
-    ("Alocações",       gest["aloc_real"],    gest["aloc_meta"],    f"{gest['aloc_real']}/{gest['aloc_meta']} reuniões"),
-    ("Acompanhamento",  gest["acomp_real"],   gest["acomp_meta"],   f"{gest['acomp_real']}/{gest['acomp_meta']} reuniões"),
-    ("Avaliação",       gest["aval_real"],    gest["aval_meta"],    f"{gest['aval_real']}/{gest['aval_meta']} reuniões"),
+    ("🫗 Alocações",       gest["aloc_real"],    gest["aloc_meta"],    f"{gest['aloc_real']}/{gest['aloc_meta']} reuniões"),
+    ("📈 Acompanhamento",  gest["acomp_real"],   gest["acomp_meta"],   f"{gest['acomp_real']}/{gest['acomp_meta']} reuniões"),
+    ("📊 Avaliação",       gest["aval_real"],    gest["aval_meta"],    f"{gest['aval_real']}/{gest['aval_meta']} reuniões"),
     ("👥 CBH Ordinária",   gest["cbh_ord_real"], gest["cbh_ord_meta"], f"{gest['cbh_ord_real']}/{gest['cbh_ord_meta']} partic."),
     ("👥 CBH Extraord.",   gest["cbh_ext_real"], gest["cbh_ext_meta"], f"{gest['cbh_ext_real']}/{gest['cbh_ext_meta']} partic."),
     ("👥 CBH Fórum",       gest["cbh_for_real"], gest["cbh_for_meta"], f"{gest['cbh_for_real']}/{gest['cbh_for_meta']} reuniões"),
-    ("Capacitações",    gest["cap_real"],     gest["cap_meta"],     f"{gest['cap_real']}/{gest['cap_meta']} capacit."),
+    ("👩‍🏫 Capacitações",    gest["cap_real"],     gest["cap_meta"],     f"{gest['cap_real']}/{gest['cap_meta']} capacit."),
 ]
 
 cols_g = st.columns(7)
@@ -348,13 +348,13 @@ avg_med_pct = (pct(oper["med_man_real"], oper["med_man_meta"]) +
                pct(oper["med_med_real"],  oper["med_med_meta"])) / 3
 
 oper_items = [
-    ("🛡️ Anomalias",     oper["anom_real"],  oper["anom_meta"],
+    ("👨‍🔧Cor. Anomalias",     oper["anom_real"],  oper["anom_meta"],
      f"Regional: {oper['anom_real']}/{oper['anom_meta']}<br>Corrigidas: {oper['anom_real']}"),
-    ("📃 Reg. Cobrança", oper["cob_real"],   oper["cob_meta"],
+    ("🪙 Reg. Cobrança", oper["cob_real"],   oper["cob_meta"],
      f"Novos: 12 | Inad.: 16<br>Real: {oper['cob_real']}/{oper['cob_meta']}"),
     ("🔎 Fiscalização",  oper["fisc_real"],  oper["fisc_meta"],
      f"Com RV: 13 | Sem RV: 38<br>Real: {oper['fisc_real']}/{oper['fisc_meta']}"),
-    ("📡 Medidores",     avg_med_pct,        100,
+    ("⏲️ Medidores",     avg_med_pct,        100,
      f"Manut.: {oper['med_man_real']}/{oper['med_man_meta']} | Inst.: {oper['med_inst_real']}/{oper['med_inst_meta']}<br>"
      f"Med.: {oper['med_med_real']}/{oper['med_med_meta']}"),
     ("🚢 Batimetria",    oper["bati_real"],   oper["bati_meta"],
