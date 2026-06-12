@@ -20,9 +20,12 @@ st.markdown("""
 
 html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 
+/* Largura fixa do container — não varia com a tela */
 .block-container {
     padding: 0 1.5rem 2rem 1.5rem !important;
-    max-width: 100% !important;
+    max-width: 1400px !important;
+    min-width: 1100px !important;
+    width: 1400px !important;
 }
 
 /* Header */
@@ -35,17 +38,19 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     align-items: center;
     gap: 1.2rem;
     flex-wrap: wrap;
+    width: 100%;
+    box-sizing: border-box;
 }
-.header-logo { font-size: 2.2rem; }
-.header-title { color: #ffffff; font-size: 1.7rem; font-weight: 800; line-height: 1.15; margin: 0; }
-.header-sub { color: rgba(255,255,255,0.78); font-size: 0.82rem; margin-top: 0.2rem; }
+.header-logo { font-size: 2.97rem; }
+.header-title { color: #ffffff; font-size: 2.295rem; font-weight: 800; line-height: 1.15; margin: 0; }
+.header-sub { color: rgba(255,255,255,0.78); font-size: 1.107rem; margin-top: 0.2rem; }
 .header-date {
     margin-left: auto;
     background: rgba(255,255,255,0.15);
     border-radius: 8px;
     padding: 0.45rem 0.9rem;
     color: #ffffff;
-    font-size: 0.82rem;
+    font-size: 1.107rem;
     font-weight: 600;
     white-space: nowrap;
 }
@@ -54,7 +59,7 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 .section-header {
     background: linear-gradient(90deg, #0b3d91 0%, #1a8a8a 100%);
     color: #ffffff;
-    font-size: 0.88rem;
+    font-size: 1.188rem;
     font-weight: 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -80,13 +85,13 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 }
 .kpi-card.warn  { border-left-color: #e07b00; }
 .kpi-card.good  { border-left-color: #1a8a8a; }
-.kpi-card-label { font-size: 0.74rem; color: #5a6a7e; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem; }
-.kpi-card-value { font-size: 1.7rem; font-weight: 800; color: #0b3d91; line-height: 1.1; }
+.kpi-card-label { font-size: 0.999rem; color: #5a6a7e; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem; }
+.kpi-card-value { font-size: 2.295rem; font-weight: 800; color: #0b3d91; line-height: 1.1; }
 .kpi-card-value.warn { color: #e07b00; }
 .kpi-card-value.good { color: #1a8a8a; }
-.kpi-card-sub   { font-size: 0.72rem; color: #8a9ab0; margin-top: 0.2rem; }
+.kpi-card-sub   { font-size: 0.792rem; color: #8a9ab0; margin-top: 0.2rem; }
 
-/* Indicator cards — SELF-CONTAINED, no plotly inside */
+/* Indicator cards */
 .ind-card {
     background: #ffffff;
     border-radius: 12px;
@@ -101,7 +106,7 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     box-sizing: border-box;
 }
 .ind-card-title {
-    font-size: 0.69rem;
+    font-size: 0.932rem;
     font-weight: 700;
     color: #0b3d91;
     text-transform: uppercase;
@@ -110,7 +115,7 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     width: 100%;
 }
 .ind-card-meta  { font-size: 0.68rem; color: #8a9ab0; }
-.ind-card-detail { font-size: 0.67rem; color: #5a6a7e; line-height: 1.5; width: 100%; }
+.ind-card-detail { font-size: 0.905rem; color: #5a6a7e; line-height: 1.5; width: 100%; }
 
 /* SVG donut inside card */
 .donut-wrap { width: 80px; height: 80px; flex-shrink: 0; }
@@ -122,7 +127,30 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     padding: 1rem 1.1rem;
     box-shadow: 0 2px 8px rgba(11,61,145,0.09);
 }
-.acude-table-title { font-size: 0.78rem; font-weight: 700; color: #0b3d91; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.7rem; }
+.acude-table-title { font-size: 1.053rem; font-weight: 700; color: #0b3d91; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.7rem; }
+
+/* Card do donut situação — largura fixa */
+.sit-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 1rem 0.75rem 0.75rem 0.75rem;
+    box-shadow: 0 2px 8px rgba(11,61,145,0.09);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+}
+.sit-card-title {
+    font-size: 1.053rem;
+    font-weight: 700;
+    color: #0b3d91;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+    text-align: center;
+    width: 100%;
+}
 
 /* Programação */
 .prog-card {
@@ -132,19 +160,19 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     box-shadow: 0 2px 8px rgba(11,61,145,0.09);
     height: 100%;
 }
-.prog-title { font-size: 0.78rem; font-weight: 700; color: #0b3d91; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.7rem; }
+.prog-title { font-size: 1.053rem; font-weight: 700; color: #0b3d91; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.7rem; }
 .prog-item {
     display: flex;
     align-items: flex-start;
     gap: 0.5rem;
     padding: 0.4rem 0;
     border-bottom: 1px solid #f0f4fa;
-    font-size: 0.8rem;
+    font-size: 0.88rem;
     color: #2d3a4a;
     line-height: 1.4;
 }
 .prog-item:last-child { border-bottom: none; }
-.prog-dot { color: #1a8a8a; font-size: 0.6rem; margin-top: 0.3rem; flex-shrink: 0; }
+.prog-dot { color: #1a8a8a; font-size: 0.81rem; margin-top: 0.3rem; flex-shrink: 0; }
 
 .js-plotly-plot .plotly .modebar { display: none !important; }
 </style>
@@ -190,11 +218,17 @@ acudes = [
     if pd.notna(df_acudes.iloc[i, 0])
 ]
 total_vol    = sum(a["vol"] for a in acudes)
-n_acima90   = sum(1 for a in acudes if a["pct"] >= 90)
-n_80_90      = sum(1 for a in acudes if 80 <= a["pct"] < 90)
-n_70_80      = sum(1 for a in acudes if 70 <= a["pct"] < 80)
+
+# Faixas: <70 | 70-80 | 80-90 | >=90
 n_abaixo70   = sum(1 for a in acudes if a["pct"] < 70)
+n_70_80      = sum(1 for a in acudes if 70 <= a["pct"] < 80)
+n_80_90      = sum(1 for a in acudes if 80 <= a["pct"] < 90)
+n_acima90    = sum(1 for a in acudes if a["pct"] >= 90)
 total_acudes = len(acudes)
+
+# KPI cards mantêm as faixas originais (<10 / 10-90 / >=90) para resumo rápido
+n_entre10_90 = sum(1 for a in acudes if 10 <= a["pct"] < 90)
+n_abaixo10   = sum(1 for a in acudes if a["pct"] < 10)
 
 prog_hoje = [
     "Solicitar apoio logístico para Erandir - reunião do FCCBH (PROCOMITÊ)",
@@ -219,7 +253,6 @@ def svg_donut(real, meta, size=80):
     circumference = 2 * math.pi * r
     dash = circumference * p / 100
     gap  = circumference - dash
-    # Começa no topo: rotate -90
     return f"""
 <svg width="{size}" height="{size}" viewBox="0 0 {size} {size}" xmlns="http://www.w3.org/2000/svg">
   <circle cx="{cx}" cy="{cy}" r="{r}" fill="none" stroke="#e8f0fb" stroke-width="{stroke_w}"/>
@@ -228,7 +261,7 @@ def svg_donut(real, meta, size=80):
           stroke-linecap="round"
           transform="rotate(-90 {cx} {cy})"/>
   <text x="{cx}" y="{cy}" text-anchor="middle" dominant-baseline="central"
-        font-family="Inter,sans-serif" font-size="12" font-weight="800" fill="{color}">{p:.0f}%</text>
+        font-family="Inter,sans-serif" font-size="16.2" font-weight="800" fill="{color}">{p:.0f}%</text>
 </svg>"""
 
 # ─── HEADER ───────────────────────────────────────────────────────────────────
@@ -310,7 +343,6 @@ for col, (label, real, meta, detail) in zip(cols_g, gest_items):
 # ─── NÚCLEO DE OPERAÇÃO ───────────────────────────────────────────────────────
 st.markdown('<div class="section-header">⚙️ NÚCLEO DE OPERAÇÃO</div>', unsafe_allow_html=True)
 
-# Medidores: média das 3 metas
 avg_med_pct = (pct(oper["med_man_real"], oper["med_man_meta"]) +
                pct(oper["med_inst_real"], oper["med_inst_meta"]) +
                pct(oper["med_med_real"],  oper["med_med_meta"])) / 3
@@ -332,11 +364,7 @@ oper_items = [
 
 cols_o = st.columns(5)
 for col, (label, real, meta, detail) in zip(cols_o, oper_items):
-    # Para medidores o real já é pct, passamos diretamente
-    if label == "📡 Medidores":
-        donut = svg_donut(real, meta)  # real=avg_pct, meta=100
-    else:
-        donut = svg_donut(real, meta)
+    donut = svg_donut(real, meta)
     with col:
         st.markdown(f"""
         <div class="ind-card">
@@ -391,43 +419,39 @@ with col_ac:
       </table>
     </div>""", unsafe_allow_html=True)
 
-# Donut de situação — Plotly correto: dentro de um único st.plotly_chart
+# ─── DONUT SITUAÇÃO — dentro de card, 4 faixas, espessura +35% ───────────────
 with col_sit:
+    # hole=0.50 → espessura ~35% maior que hole=0.60
     fig_sit = go.Figure(go.Pie(
-        labels=["≥ 90%", "80%–90%", "70%–80%", "< 70%"],
-        values=[n_acima90, n_80_90, n_70_80, n_abaixo70],
-        hole=0.46,
-        marker_colors=["#1a8a8a", "#2f6db5", "#5d8fd1", "#e07b00"],
+        labels=["Abaixo de 70%", "70% – 80%", "80% – 90%", "Acima de 90%"],
+        values=[n_abaixo70, n_70_80, n_80_90, n_acima90],
+        hole=0.50,
+        marker_colors=["#e07b00", "#f5c842", "#0b3d91", "#1a8a8a"],
         textinfo="none",
-        hovertemplate="%{label}<br>%{value} açudes<extra></extra>",
+        hovertemplate="%{label}<br>%{value} açude(s)<extra></extra>",
     ))
     fig_sit.add_annotation(
         text=f"<b>{total_acudes}</b><br><span style='font-size:9px'>açudes</span>",
         x=0.5, y=0.5, showarrow=False,
-        font=dict(size=16, color="#0b3d91", family="Inter"),
+        font=dict(size=24, color="#0b3d91", family="Inter"),
     )
     fig_sit.update_layout(
-        margin=dict(l=8, r=8, t=36, b=8),
+        margin=dict(l=8, r=8, t=8, b=8),
         showlegend=True,
         legend=dict(
             orientation="v",
             x=0.5, xanchor="center",
-            y=-0.12,
+            y=-0.18,
             font=dict(size=10, family="Inter"),
+            itemsizing="constant",
         ),
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        title=dict(
-            text="Situação dos Açudes",
-            font=dict(size=11, color="#0b3d91", family="Inter"),
-            x=0.5,
-        ),
-        height=300,
+        height=310,
     )
-    st.markdown("""
-<div class="acude-table-wrap" style="padding-bottom:0.5rem">
-    <div class="acude-table-title">📊 Situação dos Açudes</div>
-""", unsafe_allow_html=True)
+
+    # Card completo em HTML, título incluído dentro do card
+    st.markdown('<div class="sit-card"><div class="sit-card-title">📊 Situação dos Açudes</div>', unsafe_allow_html=True)
     st.plotly_chart(fig_sit, use_container_width=True, config={"displayModeBar": False}, key="donut_sit")
     st.markdown('</div>', unsafe_allow_html=True)
 
