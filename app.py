@@ -358,7 +358,7 @@ oper_items = [
      f"Manut.: {oper['med_man_real']}/{oper['med_man_meta']} | Inst.: {oper['med_inst_real']}/{oper['med_inst_meta']}<br>"
      f"Med.: {oper['med_med_real']}/{oper['med_med_meta']}"),
     ("🚢 Batimetria",    oper["bati_real"],   oper["bati_meta"],
-     f"Realizadas: {oper['bati_real']}/{oper['bati_meta']}"),
+     f"Batimetrias <br>Realizadas: {oper['bati_real']}/{oper['bati_meta']}"),
 ]
 
 cols_o = st.columns(5)
