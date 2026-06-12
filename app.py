@@ -231,11 +231,9 @@ n_entre10_90 = sum(1 for a in acudes if 10 <= a["pct"] < 90)
 n_abaixo10   = sum(1 for a in acudes if a["pct"] < 10)
 
 prog_hoje = [
-    "Solicitar apoio logístico para Erandir - reunião do FCCBH (PROCOMITÊ)",
-    "Publicação de aniversário de Raimundo Ribeiro Sales",
-    "Mobilização para 75ª Reunião Ordinária (Morrinhos/Santana do Acaraú/Amontada)",
-    "Providenciar atividades programadas para o mês de julho",
-    "Inspeção de Segurança e Medição de Vazão (Patos e Santo Antonio de Aracatiaçu)",
+    str(df_metas.iloc[i, 0]).strip()
+    for i in range(85, len(df_metas))
+    if pd.notna(df_metas.iloc[i, 0]) and str(df_metas.iloc[i, 0]).strip() not in ("", "nan")
 ]
 
 # ─── HELPERS ──────────────────────────────────────────────────────────────────
