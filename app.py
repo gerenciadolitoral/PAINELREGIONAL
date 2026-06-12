@@ -232,7 +232,7 @@ n_abaixo10   = sum(1 for a in acudes if a["pct"] < 10)
 
 prog_hoje = [
     str(df_metas.iloc[i, 0]).strip()
-    for i in range(85, len(df_metas))
+    for i in range(85, 90)
     if pd.notna(df_metas.iloc[i, 0]) and str(df_metas.iloc[i, 0]).strip() not in ("", "nan")
 ]
 
