@@ -323,9 +323,9 @@ gest_items = [
     ("Alocações",       gest["aloc_real"],    gest["aloc_meta"],    f"{gest['aloc_real']}/{gest['aloc_meta']} reuniões"),
     ("Acompanhamento",  gest["acomp_real"],   gest["acomp_meta"],   f"{gest['acomp_real']}/{gest['acomp_meta']} reuniões"),
     ("Avaliação",       gest["aval_real"],    gest["aval_meta"],    f"{gest['aval_real']}/{gest['aval_meta']} reuniões"),
-    ("CBH Ordinária",   gest["cbh_ord_real"], gest["cbh_ord_meta"], f"{gest['cbh_ord_real']}/{gest['cbh_ord_meta']} partic."),
-    ("CBH Extraord.",   gest["cbh_ext_real"], gest["cbh_ext_meta"], f"{gest['cbh_ext_real']}/{gest['cbh_ext_meta']} partic."),
-    ("CBH Fórum",       gest["cbh_for_real"], gest["cbh_for_meta"], f"{gest['cbh_for_real']}/{gest['cbh_for_meta']} reuniões"),
+    ("👥 CBH Ordinária",   gest["cbh_ord_real"], gest["cbh_ord_meta"], f"{gest['cbh_ord_real']}/{gest['cbh_ord_meta']} partic."),
+    ("👥 CBH Extraord.",   gest["cbh_ext_real"], gest["cbh_ext_meta"], f"{gest['cbh_ext_real']}/{gest['cbh_ext_meta']} partic."),
+    ("👥 CBH Fórum",       gest["cbh_for_real"], gest["cbh_for_meta"], f"{gest['cbh_for_real']}/{gest['cbh_for_meta']} reuniões"),
     ("Capacitações",    gest["cap_real"],     gest["cap_meta"],     f"{gest['cap_real']}/{gest['cap_meta']} capacit."),
 ]
 
