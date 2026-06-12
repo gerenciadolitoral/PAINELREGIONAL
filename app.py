@@ -36,16 +36,16 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     gap: 1.2rem;
     flex-wrap: wrap;
 }
-.header-logo { font-size: 2.2rem; }
-.header-title { color: #ffffff; font-size: 1.7rem; font-weight: 800; line-height: 1.15; margin: 0; }
-.header-sub { color: rgba(255,255,255,0.78); font-size: 0.82rem; margin-top: 0.2rem; }
+.header-logo { font-size: 3rem; }
+.header-title { color: #ffffff; font-size: 3rem; font-weight: 800; line-height: 1.15; margin: 0; }
+.header-sub { color: rgba(255,255,255,0.78); font-size: 1.5rem; margin-top: 0.2rem; }
 .header-date {
     margin-left: auto;
     background: rgba(255,255,255,0.15);
     border-radius: 8px;
     padding: 0.45rem 0.9rem;
     color: #ffffff;
-    font-size: 0.82rem;
+    font-size: 1,5rem;
     font-weight: 600;
     white-space: nowrap;
 }
@@ -54,7 +54,7 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 .section-header {
     background: linear-gradient(90deg, #0b3d91 0%, #1a8a8a 100%);
     color: #ffffff;
-    font-size: 0.88rem;
+    font-size: 1.5rem;
     font-weight: 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -80,11 +80,11 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 }
 .kpi-card.warn  { border-left-color: #e07b00; }
 .kpi-card.good  { border-left-color: #1a8a8a; }
-.kpi-card-label { font-size: 0.74rem; color: #5a6a7e; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem; }
-.kpi-card-value { font-size: 1.7rem; font-weight: 800; color: #0b3d91; line-height: 1.1; }
+.kpi-card-label { font-size: 1.5rem; color: #5a6a7e; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem; }
+.kpi-card-value { font-size: 2.2rem; font-weight: 800; color: #0b3d91; line-height: 1.1; }
 .kpi-card-value.warn { color: #e07b00; }
 .kpi-card-value.good { color: #1a8a8a; }
-.kpi-card-sub   { font-size: 0.72rem; color: #8a9ab0; margin-top: 0.2rem; }
+.kpi-card-sub   { font-size: 1.5rem; color: #8a9ab0; margin-top: 0.2rem; }
 
 /* Indicator cards — SELF-CONTAINED, no plotly inside */
 .ind-card {
@@ -101,7 +101,7 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     box-sizing: border-box;
 }
 .ind-card-title {
-    font-size: 0.69rem;
+    font-size: 1.5rem;
     font-weight: 700;
     color: #0b3d91;
     text-transform: uppercase;
@@ -109,8 +109,8 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     line-height: 1.3;
     width: 100%;
 }
-.ind-card-meta  { font-size: 0.68rem; color: #8a9ab0; }
-.ind-card-detail { font-size: 0.67rem; color: #5a6a7e; line-height: 1.5; width: 100%; }
+.ind-card-meta  { font-size: 1.5rem; color: #8a9ab0; }
+.ind-card-detail { font-size: 1.5rem; color: #5a6a7e; line-height: 1.5; width: 100%; }
 
 /* SVG donut inside card */
 .donut-wrap { width: 80px; height: 80px; flex-shrink: 0; }
@@ -227,7 +227,7 @@ def svg_donut(real, meta, size=80):
           stroke-linecap="round"
           transform="rotate(-90 {cx} {cy})"/>
   <text x="{cx}" y="{cy}" text-anchor="middle" dominant-baseline="central"
-        font-family="Inter,sans-serif" font-size="12" font-weight="800" fill="{color}">{p:.0f}%</text>
+        font-family="Inter,sans-serif" font-size="18" font-weight="800" fill="{color}">{p:.0f}%</text>
 </svg>"""
 
 # ─── HEADER ───────────────────────────────────────────────────────────────────
