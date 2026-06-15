@@ -18,7 +18,8 @@ st.set_page_config(
 
 # ─── IMAGEM DE FUNDO ─────────────────────────────────────────────────────────
 _fundo_css = ""
-_fundo_path = Path(__file__).parent / "fundo.jpg"
+_fundo_path = Path("fundo.jpg"),
+
 if _fundo_path.exists():
     _b64 = base64.b64encode(_fundo_path.read_bytes()).decode()
     _fundo_css = f"""
