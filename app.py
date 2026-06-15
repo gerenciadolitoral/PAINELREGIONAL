@@ -274,8 +274,8 @@ gest = dict(
 oper = dict(
     anom_meta     = cell(df_metas, 61, 2),
     anom_real     = cell(df_metas, 61, 4),
-    anom_r     = cell(df_metas, 63, 4),
-    anom_a     = cell(df_metas, 64, 4),
+    anom_r     = cell(df_metas, 62, 4),
+    anom_a     = cell(df_metas, 63, 4),
     
     cob_meta      = cell(df_metas, 65, 2),
     cob_real      = cell(df_metas, 65, 4),
