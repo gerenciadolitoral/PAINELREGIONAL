@@ -436,8 +436,7 @@ for col, (label, real, meta, detail) in zip(cols_g, gest_items):
 st.markdown('<div class="section-header">⚙️ NÚCLEO DE OPERAÇÃO</div>', unsafe_allow_html=True)
 
 avg_med_pct = (
-   avg_med_pct = (
-    pct(oper["med_man_real"],  oper["med_man_meta"])  +
+   avg_med_pct = (pct(oper["med_man_real"],  oper["med_man_meta"])  +
     pct(oper["med_inst_real"], oper["med_inst_meta"]) +
     pct(oper["med_med_real"],  oper["med_med_meta"])
 ) / 3
