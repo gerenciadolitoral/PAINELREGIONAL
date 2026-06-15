@@ -530,7 +530,7 @@ with col_ac:
           <td style="padding:0.35rem 0.5rem;font-size:0.78rem;font-weight:600;color:#0b3d91;text-align:right">{a['vol']:.2f}</td>
           <td style="padding:0.35rem 0.5rem;width:120px">
             <div style="display:flex;align-items:center;gap:0.4rem">
-              <div style="flex:1;background:#e8f0fb;border-radius:3px;height:7px;overflow:hidden">
+              <div style="flex:1;background:#e8f0fb;border-radius:3px;height:10px;overflow:hidden">
                 <div style="width:{w}%;height:100%;background:{bar_color};border-radius:3px"></div>
               </div>
               <span style="font-size:0.75rem;font-weight:700;color:{bar_color};white-space:nowrap">{pct_val:.1f}%</span>
