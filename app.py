@@ -274,6 +274,9 @@ gest = dict(
 oper = dict(
     anom_meta     = cell(df_metas, 61, 2),
     anom_real     = cell(df_metas, 61, 4),
+    anom_r     = cell(df_metas, 63, 4),
+    anom_a     = cell(df_metas, 64, 4),
+    
     cob_meta      = cell(df_metas, 65, 2),
     cob_real      = cell(df_metas, 65, 4),
     cob_novos     = cell(df_metas, 66, 2),
@@ -437,7 +440,7 @@ avg_med_pct = (pct(oper["med_man_real"],  oper["med_man_meta"])  +
 
 oper_items = [
     ("👨‍🔧 Cor. Anomalias",  oper["anom_real"],  oper["anom_meta"],
-     f"Regional: —/—<br>Corrigidas: {int(oper['anom_real'])}"),
+     f"Regional: R {int(oper['anom_r'])}/A{int(oper['anom_a'])}<br>Corrigidas: {int(oper['anom_real'])}"),
     ("🪙 Reg. Cobrança",   oper["cob_real"],   oper["cob_meta"],
      f"Novos: {int(oper['cob_novos_r'])} | Inad.: {int(oper['cob_inad_r'])}<br>Real: {int(oper['cob_real'])}/{int(oper['cob_meta'])}"),
     ("🔎 Fiscalização",    oper["fisc_real"],  oper["fisc_meta"],
