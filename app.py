@@ -541,29 +541,11 @@ with col_ac:
 
 # Donut situação
 with col_sit:
-   fig_sit = go.Figure(go.Pie(
-    labels=[
-        "Acima de 90%",
-        "80% – 90%",
-        "70% – 80%",
-        "Abaixo de 70%"
-    ],
-    values=[
-        max(n_acima90, 0),
-        max(n_80_90, 0),
-        max(n_70_80, 0),
-        max(n_abaixo70, 0)
-    ],
-    hole=0.50,
-    marker_colors=[
-        "#1a8a8a",  # acima 90
-        "#0b3d91",  # 80-90
-        "#f5c842",  # 70-80
-        "#e07b00"   # abaixo 70
-    ],
-    textinfo="none",
-    hovertemplate="%{label}<br>%{value} açude(s)<extra></extra>",
-))
+  fig_sit = go.Figure(go.Pie( labels=["Abaixo de 70%", "70% – 80%", "80% – 90%", "Acima de 90%"], 
+  values=[max(n_abaixo70, 0), max(n_70_80, 0), max(n_80_90, 0), max(n_acima90, 0)], 
+  hole=0.50, marker_colors=["#e07b00", "#f5c842", "#0b3d91", "#1a8a8a"], 
+  textinfo="none", hovertemplate="%{label}<br>%{value} açude(s)<extra></extra>",
+  ))
     fig_sit.add_annotation(
         text=f"<b>{total_acudes}</b><br><span style='font-size:9px'>açudes</span>",
         x=0.5, y=0.5, showarrow=False,
