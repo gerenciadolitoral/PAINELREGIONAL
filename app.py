@@ -517,9 +517,9 @@ with col_ac:
     for a in acudes:
         pct_val = a["pct"]
         if pct_val >= 90:
-            bar_color, dot = "#1a8a8a", "🟢"
-        elif pct_val >= 10:
             bar_color, dot = "#0b3d91", "🔵"
+        elif pct_val >= 70:
+            bar_color, dot = "#1a8a8a", "🟢"
         else:
             bar_color, dot = "#e07b00", "🟠"
         w = min(pct_val, 100)
