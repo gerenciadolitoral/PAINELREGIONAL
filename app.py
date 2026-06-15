@@ -570,7 +570,7 @@ with col_sit:
                 max(n_abaixo70, 0),
             ],
             hole=0.50,
-            marker_colors=[, "#0b3d91", "#1a8a8a", "#f5c842", "#e07b00"],
+            marker_colors=[ "#0b3d91", "#1a8a8a", "#f5c842", "#e07b00"],
             textinfo="none",
             hovertemplate="%{label}<br>%{value} açude(s)<extra></extra>",
             sort=False,
