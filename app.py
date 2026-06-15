@@ -2,6 +2,8 @@ import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
 import math
+import io
+import requests
 from pathlib import Path
 from datetime import date
 
@@ -20,7 +22,6 @@ st.markdown("""
 
 html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 
-/* Largura fixa do container — não varia com a tela */
 .block-container {
     padding: 1.5rem 1.5rem 2rem 1.5rem !important;
     max-width: 1400px !important;
@@ -28,7 +29,6 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     width: 1400px !important;
 }
 
-/* Header */
 .header-banner {
     background: linear-gradient(135deg, #0b3d91 0%, #0d5fa6 40%, #1a8a8a 100%);
     border-radius: 0 0 16px 16px;
@@ -55,7 +55,6 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     white-space: nowrap;
 }
 
-/* Section headers */
 .section-header {
     background: linear-gradient(90deg, #0b3d91 0%, #1a8a8a 100%);
     color: #ffffff;
@@ -71,7 +70,6 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     gap: 0.5rem;
 }
 
-/* KPI top row */
 .kpi-card {
     background: #ffffff;
     border-radius: 12px;
@@ -91,7 +89,6 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 .kpi-card-value.good { color: #1a8a8a; }
 .kpi-card-sub   { font-size: 0.792rem; color: #8a9ab0; margin-top: 0.2rem; }
 
-/* Indicator cards */
 .ind-card {
     background: #ffffff;
     border-radius: 12px;
@@ -117,10 +114,6 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 .ind-card-meta  { font-size: 0.68rem; color: #8a9ab0; }
 .ind-card-detail { font-size: 0.905rem; color: #5a6a7e; line-height: 1.5; width: 100%; }
 
-/* SVG donut inside card */
-.donut-wrap { width: 80px; height: 80px; flex-shrink: 0; }
-
-/* Açudes table */
 .acude-table-wrap {
     background: #ffffff;
     border-radius: 12px;
@@ -129,7 +122,6 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 }
 .acude-table-title { font-size: 1.053rem; font-weight: 700; color: #0b3d91; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.7rem; }
 
-/* Card do donut situação — largura fixa */
 .sit-card {
     background: #ffffff;
     border-radius: 12px;
@@ -152,7 +144,6 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     width: 100%;
 }
 
-/* Programação */
 .prog-card {
     background: #ffffff;
     border-radius: 12px;
@@ -174,80 +165,194 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 .prog-item:last-child { border-bottom: none; }
 .prog-dot { color: #1a8a8a; font-size: 0.81rem; margin-top: 0.3rem; flex-shrink: 0; }
 
+.fonte-badge {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-left: 0.5rem;
+}
+.fonte-online { background: #d4edda; color: #155724; }
+.fonte-local  { background: #fff3cd; color: #856404; }
+
 .js-plotly-plot .plotly .modebar { display: none !important; }
 </style>
 """, unsafe_allow_html=True)
 
-# ─── DATA ─────────────────────────────────────────────────────────────────────
-XLSX = Path(__file__).parent / "painel da grlitoral.xlsx"
+# ─── CONFIGURAÇÃO DA FONTE DE DADOS ──────────────────────────────────────────
+SHEET_ID = "1kte6Ys9vgzw7a0Z1PDXkxf6VOX9KHWlRCXp7P-7RSi4"
+XLSX_LOCAL = Path(__file__).parent / "painel da grlitoral.xlsx"
+
+# GIDs de cada aba (gid=0 é metas; os demais precisam ser confirmados)
+# Usamos nome de aba no export, que é mais robusto que gid
+SHEETS = {
+    "metas":  f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&sheet=metas",
+    "açudes": f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&sheet=a%C3%A7udes",
+    "prog":   f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&sheet=prog",
+}
+
+def _safe_float(val, default=0.0):
+    """Converte valor para float com segurança, ignorando erros e strings."""
+    if val is None:
+        return default
+    try:
+        f = float(str(val).replace(",", ".").strip())
+        return default if math.isnan(f) else f
+    except (ValueError, TypeError):
+        return default
+
+def _safe_str(val):
+    s = str(val).strip() if val is not None else ""
+    return "" if s.lower() in ("nan", "none", "") else s
 
 @st.cache_data(ttl=300)
 def load_data():
-    df_m = pd.read_excel(XLSX, sheet_name="metas",  header=None)
-    df_a = pd.read_excel(XLSX, sheet_name="açudes", header=None)
-    return df_m, df_a
+    """
+    Tenta carregar dados do Google Sheets online.
+    Se falhar (sem rede, planilha privada, etc.), usa o xlsx local como fallback.
+    Retorna (df_metas, df_acudes, df_prog, fonte) onde fonte='online' ou 'local'.
+    """
+    try:
+        dfs = {}
+        for nome, url in SHEETS.items():
+            resp = requests.get(url, timeout=15)
+            resp.raise_for_status()
+            dfs[nome] = pd.read_csv(
+                io.StringIO(resp.text),
+                header=None,
+                dtype=str,
+                keep_default_na=False,
+            )
+        return dfs["metas"], dfs["açudes"], dfs.get("prog", pd.DataFrame()), "online"
 
-df_metas, df_acudes = load_data()
+    except Exception:
+        # Fallback: xlsx local
+        try:
+            df_m = pd.read_excel(XLSX_LOCAL, sheet_name="metas",  header=None, dtype=str)
+            df_a = pd.read_excel(XLSX_LOCAL, sheet_name="açudes", header=None, dtype=str)
+            df_p = pd.read_excel(XLSX_LOCAL, sheet_name="prog",   header=None, dtype=str)
+            return df_m, df_a, df_p, "local"
+        except Exception as e:
+            st.error(f"Erro ao carregar dados: {e}")
+            st.stop()
+
+df_metas, df_acudes, df_prog, fonte_dados = load_data()
+
+# ─── HELPERS DE LEITURA ───────────────────────────────────────────────────────
+def cell(df, row, col, default=0.0):
+    """Lê célula (0-indexed) com conversão segura para float."""
+    try:
+        return _safe_float(df.iloc[row, col], default)
+    except (IndexError, KeyError):
+        return default
+
+def cell_str(df, row, col):
+    try:
+        return _safe_str(df.iloc[row, col])
+    except (IndexError, KeyError):
+        return ""
+
+# ─── PARSE DOS INDICADORES (posições fixas, baseadas no layout da planilha) ───
+#
+# Coluna 2 (C) = Meta total do indicador
+# Coluna 4 (E) = Realizado acumulado
+#
+# Linha  2 (L3)  = CBH Ordinária      meta=C3, real=E4
+# Linha  7 (L8)  = CBH Extraordinária  meta=C8, real=E9
+# Linha 13 (L14) = CBH Fórum           meta=C14, real=E14
+# Linha 18 (L19) = Capacitação         meta=C19, real=E19
+# Linha 28 (L29) = Alocação            meta=C29, real=E29
+# Linha 38 (L39) = Acompanhamento      meta=C39, real=E39
+# Linha 48 (L49) = Avaliação           meta=C49, real=E49
+# Linha 61 (L62) = Anomalias           meta=C62, real=E62
+# Linha 65 (L66) = Cobrança            meta=C66, real=E66
+# Linha 69 (L70) = Fiscalização        meta=C70, real=E70
+# Linha 73 (L74) = Medidores (índice)  meta=C74, real=E74
+# Linha 74 (L75) = Manutenções         meta=C75, real=E75
+# Linha 75 (L76) = Instalações         meta=C76, real=E76
+# Linha 76 (L77) = Medições            meta=C77, real=E77
+# Linha 78 (L79) = Batimetria          meta=C79, real=E79
+# Linhas 85-89 (L86-L90) = Programação de hoje (col A)
 
 gest = dict(
-    cbh_ord_meta=160, cbh_ord_real=34,
-    cbh_ext_meta=160, cbh_ext_real=28,
-    cbh_for_meta=4,   cbh_for_real=1,
-    cap_meta=8,       cap_real=2,
-    aloc_meta=8,      aloc_real=0,
-    acomp_meta=8,     acomp_real=0,
-    aval_meta=8,      aval_real=10,
+    cbh_ord_meta  = cell(df_metas,  2, 2),
+    cbh_ord_real  = cell(df_metas,  3, 4),
+    cbh_ext_meta  = cell(df_metas,  7, 2),
+    cbh_ext_real  = cell(df_metas,  8, 4),
+    cbh_for_meta  = cell(df_metas, 13, 2),
+    cbh_for_real  = cell(df_metas, 13, 4),
+    cap_meta      = cell(df_metas, 18, 2),
+    cap_real      = cell(df_metas, 18, 4),
+    aloc_meta     = cell(df_metas, 28, 2),
+    aloc_real     = cell(df_metas, 28, 4),
+    acomp_meta    = cell(df_metas, 38, 2),
+    acomp_real    = cell(df_metas, 38, 4),
+    aval_meta     = cell(df_metas, 48, 2),
+    aval_real     = cell(df_metas, 48, 4),
 )
 
 oper = dict(
-    anom_meta=23,     anom_real=15,
-    cob_meta=37,      cob_real=28,
-    fisc_meta=105,    fisc_real=51,
-    med_man_meta=18,  med_man_real=4,
-    med_inst_meta=10, med_inst_real=3,
-    med_med_meta=56,  med_med_real=11,
-    bati_meta=2,      bati_real=1,
+    anom_meta     = cell(df_metas, 61, 2),
+    anom_real     = cell(df_metas, 61, 4),
+    cob_meta      = cell(df_metas, 65, 2),
+    cob_real      = cell(df_metas, 65, 4),
+    cob_novos     = cell(df_metas, 66, 2),
+    cob_novos_r   = cell(df_metas, 66, 4),
+    cob_inad      = cell(df_metas, 67, 2),
+    cob_inad_r    = cell(df_metas, 67, 4),
+    fisc_meta     = cell(df_metas, 69, 2),
+    fisc_real     = cell(df_metas, 69, 4),
+    fisc_rv       = cell(df_metas, 70, 4),
+    fisc_srv      = cell(df_metas, 71, 4),
+    med_man_meta  = cell(df_metas, 74, 2),
+    med_man_real  = cell(df_metas, 74, 4),
+    med_inst_meta = cell(df_metas, 75, 2),
+    med_inst_real = cell(df_metas, 75, 4),
+    med_med_meta  = cell(df_metas, 76, 2),
+    med_med_real  = cell(df_metas, 76, 4),
+    bati_meta     = cell(df_metas, 78, 2),
+    bati_real     = cell(df_metas, 78, 4),
 )
 
-acudes = [
-    {"nome": str(df_acudes.iloc[i, 0]).strip(),
-     "municipio": str(df_acudes.iloc[i, 1]).strip(),
-     "vol": float(df_acudes.iloc[i, 8]),
-     "pct": float(df_acudes.iloc[i, 9])}
-    for i in range(len(df_acudes))
-    if pd.notna(df_acudes.iloc[i, 0])
-]
-total_vol    = sum(a["vol"] for a in acudes)
+# Programação de hoje (linhas 85–89 = índices 85,86,87,88,89)
+prog_hoje = []
+for i in range(85, 95):
+    s = cell_str(df_metas, i, 0)
+    if s and s.upper() not in ("PROGRAMAÇÃO DE HOJE",):
+        prog_hoje.append(s)
+    if len(prog_hoje) >= 8:
+        break
 
-# Faixas: <70 | 70-80 | 80-90 | >=90
-n_abaixo70   = sum(1 for a in acudes if a["pct"] < 70)
-n_70_80      = sum(1 for a in acudes if 70 <= a["pct"] < 80)
-n_80_90      = sum(1 for a in acudes if 80 <= a["pct"] < 90)
-n_acima90    = sum(1 for a in acudes if a["pct"] >= 90)
-total_acudes = len(acudes)
+# Açudes: col 0=nome, col 1=município, col 8=vol(hm³), col 9=%(cap)
+acudes = []
+for i in range(len(df_acudes)):
+    nome = cell_str(df_acudes, i, 0)
+    if not nome:
+        continue
+    vol = _safe_float(df_acudes.iloc[i, 8] if df_acudes.shape[1] > 8 else None)
+    pct_val = _safe_float(df_acudes.iloc[i, 9] if df_acudes.shape[1] > 9 else None)
+    municipio = cell_str(df_acudes, i, 1)
+    acudes.append({"nome": nome, "municipio": municipio, "vol": vol, "pct": pct_val})
 
-# KPI cards mantêm as faixas originais (<10 / 10-90 / >=90) para resumo rápido
-n_entre10_90 = sum(1 for a in acudes if 10 <= a["pct"] < 90)
-n_abaixo10   = sum(1 for a in acudes if a["pct"] < 10)
+total_vol     = sum(a["vol"] for a in acudes)
+total_acudes  = len(acudes)
+n_acima90     = sum(1 for a in acudes if a["pct"] >= 90)
+n_80_90       = sum(1 for a in acudes if 80 <= a["pct"] < 90)
+n_70_80       = sum(1 for a in acudes if 70 <= a["pct"] < 80)
+n_abaixo70    = sum(1 for a in acudes if a["pct"] < 70)
+n_entre10_90  = sum(1 for a in acudes if 10 <= a["pct"] < 90)
+n_abaixo10    = sum(1 for a in acudes if a["pct"] < 10)
 
-prog_hoje = [
-    str(df_metas.iloc[i, 0]).strip()
-    for i in range(85, 90)
-    if pd.notna(df_metas.iloc[i, 0]) and str(df_metas.iloc[i, 0]).strip() not in ("", "nan")
-]
-
-# ─── HELPERS ──────────────────────────────────────────────────────────────────
+# ─── HELPERS DE VISUALIZAÇÃO ──────────────────────────────────────────────────
 def pct(real, meta):
     if meta == 0: return 0
     return round(real / meta * 100, 1)
 
 def svg_donut(real, meta, size=80):
-    """Gera um mini donut SVG completamente autocontido — sem Plotly."""
     p = min(pct(real, meta), 100)
     color = "#1a8a8a" if p >= 100 else "#0b3d91"
-    r = 30
-    cx = cy = size / 2
-    stroke_w = 12
+    r = 30; cx = cy = size / 2; stroke_w = 12
     circumference = 2 * math.pi * r
     dash = circumference * p / 100
     gap  = circumference - dash
@@ -255,8 +360,7 @@ def svg_donut(real, meta, size=80):
 <svg width="{size}" height="{size}" viewBox="0 0 {size} {size}" xmlns="http://www.w3.org/2000/svg">
   <circle cx="{cx}" cy="{cy}" r="{r}" fill="none" stroke="#e8f0fb" stroke-width="{stroke_w}"/>
   <circle cx="{cx}" cy="{cy}" r="{r}" fill="none" stroke="{color}" stroke-width="{stroke_w}"
-          stroke-dasharray="{dash:.2f} {gap:.2f}"
-          stroke-linecap="round"
+          stroke-dasharray="{dash:.2f} {gap:.2f}" stroke-linecap="round"
           transform="rotate(-90 {cx} {cy})"/>
   <text x="{cx}" y="{cy}" text-anchor="middle" dominant-baseline="central"
         font-family="Inter,sans-serif" font-size="16.2" font-weight="800" fill="{color}">{p:.0f}%</text>
@@ -264,12 +368,18 @@ def svg_donut(real, meta, size=80):
 
 # ─── HEADER ───────────────────────────────────────────────────────────────────
 today_str = date.today().strftime("%d/%m/%Y")
+badge_cls  = "fonte-online" if fonte_dados == "online" else "fonte-local"
+badge_txt  = "🟢 Online" if fonte_dados == "online" else "🟡 Local (cache)"
+
 st.markdown(f"""
 <div class="header-banner">
   <div class="header-logo">💧</div>
   <div>
     <div class="header-title">Dashboard Estratégico da Gerência Regional</div>
-    <div class="header-sub">Monitoramento integrado dos indicadores de gestão e operação – GR Litoral / Itapipoca</div>
+    <div class="header-sub">
+      Monitoramento integrado dos indicadores de gestão e operação – GR Litoral / Itapipoca
+      <span class="fonte-badge {badge_cls}">{badge_txt}</span>
+    </div>
   </div>
   <div class="header-date">📅 {today_str} &nbsp;|&nbsp; COGERH</div>
 </div>
@@ -296,14 +406,14 @@ with col3:
     <div class="kpi-card good">
       <div class="kpi-card-label">✅ Acima de 90%</div>
       <div class="kpi-card-value good">{n_acima90}</div>
-      <div class="kpi-card-sub">{n_acima90/total_acudes*100:.1f}% do total</div>
+      <div class="kpi-card-sub">{n_acima90/max(total_acudes,1)*100:.1f}% do total</div>
     </div>""", unsafe_allow_html=True)
 with col4:
     st.markdown(f"""
     <div class="kpi-card">
       <div class="kpi-card-label">〰️ Entre 10% e 90%</div>
       <div class="kpi-card-value">{n_entre10_90}</div>
-      <div class="kpi-card-sub">{n_entre10_90/total_acudes*100:.1f}% do total</div>
+      <div class="kpi-card-sub">{n_entre10_90/max(total_acudes,1)*100:.1f}% do total</div>
     </div>""", unsafe_allow_html=True)
 with col5:
     cls = "warn" if n_abaixo10 > 0 else ""
@@ -311,20 +421,20 @@ with col5:
     <div class="kpi-card {cls}">
       <div class="kpi-card-label">⚠️ Abaixo de 10%</div>
       <div class="kpi-card-value {cls}">{n_abaixo10}</div>
-      <div class="kpi-card-sub">{n_abaixo10/total_acudes*100:.1f}% do total</div>
+      <div class="kpi-card-sub">{n_abaixo10/max(total_acudes,1)*100:.1f}% do total</div>
     </div>""", unsafe_allow_html=True)
 
 # ─── NÚCLEO DE GESTÃO ─────────────────────────────────────────────────────────
 st.markdown('<div class="section-header">👥 NÚCLEO DE GESTÃO</div>', unsafe_allow_html=True)
 
 gest_items = [
-    ("🫗 Alocações",       gest["aloc_real"],    gest["aloc_meta"],    f"{gest['aloc_real']}/{gest['aloc_meta']} reuniões"),
-    ("📈 Acompanhar",  gest["acomp_real"],   gest["acomp_meta"],   f"{gest['acomp_real']}/{gest['acomp_meta']} reuniões"),
-    ("📊 Avaliação",       gest["aval_real"],    gest["aval_meta"],    f"{gest['aval_real']}/{gest['aval_meta']} reuniões"),
-    ("👥 CBH Ordinária",   gest["cbh_ord_real"], gest["cbh_ord_meta"], f"{gest['cbh_ord_real']}/{gest['cbh_ord_meta']} partic."),
-    ("👥 CBH Extraord.",   gest["cbh_ext_real"], gest["cbh_ext_meta"], f"{gest['cbh_ext_real']}/{gest['cbh_ext_meta']} partic."),
-    ("👥 CBH Fórum",       gest["cbh_for_real"], gest["cbh_for_meta"], f"{gest['cbh_for_real']}/{gest['cbh_for_meta']} reuniões"),
-    ("👩‍🏫 Capacitações",    gest["cap_real"],     gest["cap_meta"],     f"{gest['cap_real']}/{gest['cap_meta']} capacit."),
+    ("🫗 Alocações",     gest["aloc_real"],    gest["aloc_meta"],    f"{int(gest['aloc_real'])}/{int(gest['aloc_meta'])} reuniões"),
+    ("📈 Acompanhar",    gest["acomp_real"],   gest["acomp_meta"],   f"{int(gest['acomp_real'])}/{int(gest['acomp_meta'])} reuniões"),
+    ("📊 Avaliação",     gest["aval_real"],    gest["aval_meta"],    f"{int(gest['aval_real'])}/{int(gest['aval_meta'])} reuniões"),
+    ("👥 CBH Ordinária", gest["cbh_ord_real"], gest["cbh_ord_meta"], f"{int(gest['cbh_ord_real'])}/{int(gest['cbh_ord_meta'])} partic."),
+    ("👥 CBH Extraord.", gest["cbh_ext_real"], gest["cbh_ext_meta"], f"{int(gest['cbh_ext_real'])}/{int(gest['cbh_ext_meta'])} partic."),
+    ("👥 CBH Fórum",     gest["cbh_for_real"], gest["cbh_for_meta"], f"{int(gest['cbh_for_real'])}/{int(gest['cbh_for_meta'])} reuniões"),
+    ("👩‍🏫 Capacitações",  gest["cap_real"],     gest["cap_meta"],     f"{int(gest['cap_real'])}/{int(gest['cap_meta'])} capacit."),
 ]
 
 cols_g = st.columns(7)
@@ -341,22 +451,22 @@ for col, (label, real, meta, detail) in zip(cols_g, gest_items):
 # ─── NÚCLEO DE OPERAÇÃO ───────────────────────────────────────────────────────
 st.markdown('<div class="section-header">⚙️ NÚCLEO DE OPERAÇÃO</div>', unsafe_allow_html=True)
 
-avg_med_pct = (pct(oper["med_man_real"], oper["med_man_meta"]) +
+avg_med_pct = (pct(oper["med_man_real"],  oper["med_man_meta"])  +
                pct(oper["med_inst_real"], oper["med_inst_meta"]) +
                pct(oper["med_med_real"],  oper["med_med_meta"])) / 3
 
 oper_items = [
-    ("👨‍🔧Cor. Anomalias",     oper["anom_real"],  oper["anom_meta"],
-     f"Regional: {oper['anom_real']}/{oper['anom_meta']}<br>Corrigidas: {oper['anom_real']}"),
-    ("🪙 Reg. Cobrança", oper["cob_real"],   oper["cob_meta"],
-     f"Novos: 12 | Inad.: 16<br>Real: {oper['cob_real']}/{oper['cob_meta']}"),
-    ("🔎 Fiscalização",  oper["fisc_real"],  oper["fisc_meta"],
-     f"Com RV: 13 | Sem RV: 38<br>Real: {oper['fisc_real']}/{oper['fisc_meta']}"),
-    ("⏲️ Medidores",     avg_med_pct,        100,
-     f"Manut.: {oper['med_man_real']}/{oper['med_man_meta']} | Inst.: {oper['med_inst_real']}/{oper['med_inst_meta']}<br>"
-     f"Med.: {oper['med_med_real']}/{oper['med_med_meta']}"),
-    ("🚢 Batimetria",    oper["bati_real"],   oper["bati_meta"],
-     f"Batimetrias <br>Realizadas: {oper['bati_real']}/{oper['bati_meta']}"),
+    ("👨‍🔧 Cor. Anomalias",  oper["anom_real"],  oper["anom_meta"],
+     f"Regional: —/—<br>Corrigidas: {int(oper['anom_real'])}"),
+    ("🪙 Reg. Cobrança",   oper["cob_real"],   oper["cob_meta"],
+     f"Novos: {int(oper['cob_novos_r'])} | Inad.: {int(oper['cob_inad_r'])}<br>Real: {int(oper['cob_real'])}/{int(oper['cob_meta'])}"),
+    ("🔎 Fiscalização",    oper["fisc_real"],  oper["fisc_meta"],
+     f"Com RV: {int(oper['fisc_rv'])} | Sem RV: {int(oper['fisc_srv'])}<br>Real: {int(oper['fisc_real'])}/{int(oper['fisc_meta'])}"),
+    ("⏲️ Medidores",       avg_med_pct,        100,
+     f"Manut.: {int(oper['med_man_real'])}/{int(oper['med_man_meta'])} | Inst.: {int(oper['med_inst_real'])}/{int(oper['med_inst_meta'])}<br>"
+     f"Med.: {int(oper['med_med_real'])}/{int(oper['med_med_meta'])}"),
+    ("🚢 Batimetria",      oper["bati_real"],  oper["bati_meta"],
+     f"Batimetrias<br>Realizadas: {int(oper['bati_real'])}/{int(oper['bati_meta'])}"),
 ]
 
 cols_o = st.columns(5)
@@ -416,12 +526,11 @@ with col_ac:
       </table>
     </div>""", unsafe_allow_html=True)
 
-# ─── DONUT SITUAÇÃO — dentro de card, 4 faixas, espessura +35% ───────────────
+# Donut situação
 with col_sit:
-    # hole=0.50 → espessura ~35% maior que hole=0.60
     fig_sit = go.Figure(go.Pie(
         labels=["Abaixo de 70%", "70% – 80%", "80% – 90%", "Acima de 90%"],
-        values=[n_abaixo70, n_70_80, n_80_90, n_acima90],
+        values=[max(n_abaixo70, 0), max(n_70_80, 0), max(n_80_90, 0), max(n_acima90, 0)],
         hole=0.50,
         marker_colors=["#e07b00", "#f5c842", "#0b3d91", "#1a8a8a"],
         textinfo="none",
@@ -435,19 +544,12 @@ with col_sit:
     fig_sit.update_layout(
         margin=dict(l=8, r=8, t=8, b=8),
         showlegend=True,
-        legend=dict(
-            orientation="v",
-            x=0.5, xanchor="right",
-            y=-0.18,
-            font=dict(size=10, family="Inter"),
-            itemsizing="constant",
-        ),
+        legend=dict(orientation="v", x=0.5, xanchor="right", y=-0.18,
+                    font=dict(size=10, family="Inter"), itemsizing="constant"),
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
         height=310,
     )
-
-    # Card completo em HTML, título incluído dentro do card
     st.markdown('<div class="sit-card"><div class="sit-card-title">📊 Situação dos Açudes</div>', unsafe_allow_html=True)
     st.plotly_chart(fig_sit, use_container_width=True, config={"displayModeBar": False}, key="donut_sit")
     st.markdown('</div>', unsafe_allow_html=True)
@@ -457,7 +559,7 @@ with col_prog:
     items_html = "".join(
         f'<div class="prog-item"><span class="prog-dot">●</span><span>{t}</span></div>'
         for t in prog_hoje
-    )
+    ) or '<div class="prog-item"><span style="color:#8a9ab0">Nenhuma programação registrada para hoje.</span></div>'
     st.markdown(f"""
     <div class="prog-card">
       <div class="prog-title">📅 Programação — {today_str}</div>
@@ -465,8 +567,9 @@ with col_prog:
     </div>""", unsafe_allow_html=True)
 
 # ─── FOOTER ───────────────────────────────────────────────────────────────────
-st.markdown("""
+fonte_label = "Google Sheets (online)" if fonte_dados == "online" else "arquivo local (xlsx)"
+st.markdown(f"""
 <div style="text-align:center;margin-top:1.5rem;color:#8a9ab0;font-size:0.72rem">
   COGERH – Companhia de Gestão dos Recursos Hídricos &nbsp;|&nbsp; GR Litoral / Itapipoca &nbsp;|&nbsp;
-  Dados: painel_da_grlitoral.xlsx
+  Fonte: {fonte_label} &nbsp;|&nbsp; Cache: 5 min
 </div>""", unsafe_allow_html=True)
