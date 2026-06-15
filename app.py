@@ -181,19 +181,20 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 """, unsafe_allow_html=True)
 
 # ─── CONFIGURAÇÃO DA FONTE DE DADOS ──────────────────────────────────────────
-SHEET_ID = "1kte6Ys9vgzw7a0Z1PDXkxf6VOX9KHWlRCXp7P-7RSi4"
+SHEET_ID  = "1kte6Ys9vgzw7a0Z1PDXkxf6VOX9KHWlRCXp7P-7RSi4"
 XLSX_LOCAL = Path(__file__).parent / "painel da grlitoral.xlsx"
 
-# GIDs de cada aba (gid=0 é metas; os demais precisam ser confirmados)
-# Usamos nome de aba no export, que é mais robusto que gid
 SHEETS = {
     "metas":  f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&sheet=metas",
     "açudes": f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&sheet=a%C3%A7udes",
     "prog":   f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&sheet=prog",
 }
 
+# Intervalo dos açudes na planilha: A100:A107 → índices 99–106 (0-based)
+ACUDE_START = 99
+ACUDE_END   = 107  # exclusive
+
 def _safe_float(val, default=0.0):
-    """Converte valor para float com segurança, ignorando erros e strings."""
     if val is None:
         return default
     try:
@@ -210,13 +211,14 @@ def _safe_str(val):
 def load_data():
     """
     Tenta carregar dados do Google Sheets online.
-    Se falhar (sem rede, planilha privada, etc.), usa o xlsx local como fallback.
-    Retorna (df_metas, df_acudes, df_prog, fonte) onde fonte='online' ou 'local'.
+    Se falhar, usa o xlsx local como fallback.
+    Retorna (df_metas, df_acudes, df_prog, fonte).
     """
     try:
         dfs = {}
         for nome, url in SHEETS.items():
             resp = requests.get(url, timeout=15)
+            resp.encoding = "utf-8"          # ← CORRIGIDO: força encoding antes de resp.text
             resp.raise_for_status()
             dfs[nome] = pd.read_csv(
                 io.StringIO(resp.text),
@@ -227,7 +229,6 @@ def load_data():
         return dfs["metas"], dfs["açudes"], dfs.get("prog", pd.DataFrame()), "online"
 
     except Exception:
-        # Fallback: xlsx local
         try:
             df_m = pd.read_excel(XLSX_LOCAL, sheet_name="metas",  header=None, dtype=str)
             df_a = pd.read_excel(XLSX_LOCAL, sheet_name="açudes", header=None, dtype=str)
@@ -241,7 +242,6 @@ df_metas, df_acudes, df_prog, fonte_dados = load_data()
 
 # ─── HELPERS DE LEITURA ───────────────────────────────────────────────────────
 def cell(df, row, col, default=0.0):
-    """Lê célula (0-indexed) com conversão segura para float."""
     try:
         return _safe_float(df.iloc[row, col], default)
     except (IndexError, KeyError):
@@ -253,28 +253,7 @@ def cell_str(df, row, col):
     except (IndexError, KeyError):
         return ""
 
-# ─── PARSE DOS INDICADORES (posições fixas, baseadas no layout da planilha) ───
-#
-# Coluna 2 (C) = Meta total do indicador
-# Coluna 4 (E) = Realizado acumulado
-#
-# Linha  2 (L3)  = CBH Ordinária      meta=C3, real=E4
-# Linha  7 (L8)  = CBH Extraordinária  meta=C8, real=E9
-# Linha 13 (L14) = CBH Fórum           meta=C14, real=E14
-# Linha 18 (L19) = Capacitação         meta=C19, real=E19
-# Linha 28 (L29) = Alocação            meta=C29, real=E29
-# Linha 38 (L39) = Acompanhamento      meta=C39, real=E39
-# Linha 48 (L49) = Avaliação           meta=C49, real=E49
-# Linha 61 (L62) = Anomalias           meta=C62, real=E62
-# Linha 65 (L66) = Cobrança            meta=C66, real=E66
-# Linha 69 (L70) = Fiscalização        meta=C70, real=E70
-# Linha 73 (L74) = Medidores (índice)  meta=C74, real=E74
-# Linha 74 (L75) = Manutenções         meta=C75, real=E75
-# Linha 75 (L76) = Instalações         meta=C76, real=E76
-# Linha 76 (L77) = Medições            meta=C77, real=E77
-# Linha 78 (L79) = Batimetria          meta=C79, real=E79
-# Linhas 85-89 (L86-L90) = Programação de hoje (col A)
-
+# ─── PARSE DOS INDICADORES ────────────────────────────────────────────────────
 gest = dict(
     cbh_ord_meta  = cell(df_metas,  2, 2),
     cbh_ord_real  = cell(df_metas,  3, 4),
@@ -315,7 +294,7 @@ oper = dict(
     bati_real     = cell(df_metas, 78, 4),
 )
 
-# Programação de hoje (linhas 85–89 = índices 85,86,87,88,89)
+# Programação de hoje (linhas 85–94, col A)
 prog_hoje = []
 for i in range(85, 95):
     s = cell_str(df_metas, i, 0)
@@ -324,25 +303,26 @@ for i in range(85, 95):
     if len(prog_hoje) >= 8:
         break
 
-# Açudes: col 0=nome, col 1=município, col 8=vol(hm³), col 9=%(cap)
+# ─── PARSE DOS AÇUDES ─────────────────────────────────────────────────────────
+# Intervalo correto: linhas 100–107 da planilha = índices 99–106 (0-based)
 acudes = []
-for i in range(len(df_acudes)):
+for i in range(ACUDE_START, min(ACUDE_END, len(df_acudes))):
     nome = cell_str(df_acudes, i, 0)
     if not nome:
         continue
-    vol = _safe_float(df_acudes.iloc[i, 8] if df_acudes.shape[1] > 8 else None)
+    vol     = _safe_float(df_acudes.iloc[i, 8] if df_acudes.shape[1] > 8 else None)
     pct_val = _safe_float(df_acudes.iloc[i, 9] if df_acudes.shape[1] > 9 else None)
     municipio = cell_str(df_acudes, i, 1)
     acudes.append({"nome": nome, "municipio": municipio, "vol": vol, "pct": pct_val})
 
-total_vol     = sum(a["vol"] for a in acudes)
-total_acudes  = len(acudes)
-n_acima90     = sum(1 for a in acudes if a["pct"] >= 90)
-n_80_90       = sum(1 for a in acudes if 80 <= a["pct"] < 90)
-n_70_80       = sum(1 for a in acudes if 70 <= a["pct"] < 80)
-n_abaixo70    = sum(1 for a in acudes if a["pct"] < 70)
-n_entre10_90  = sum(1 for a in acudes if 10 <= a["pct"] < 90)
-n_abaixo10    = sum(1 for a in acudes if a["pct"] < 10)
+total_vol    = sum(a["vol"] for a in acudes)
+total_acudes = len(acudes)
+n_acima90    = sum(1 for a in acudes if a["pct"] >= 90)
+n_80_90      = sum(1 for a in acudes if 80 <= a["pct"] < 90)
+n_70_80      = sum(1 for a in acudes if 70 <= a["pct"] < 80)
+n_abaixo70   = sum(1 for a in acudes if a["pct"] < 70)
+n_entre10_90 = sum(1 for a in acudes if 10 <= a["pct"] < 90)
+n_abaixo10   = sum(1 for a in acudes if a["pct"] < 10)
 
 # ─── HELPERS DE VISUALIZAÇÃO ──────────────────────────────────────────────────
 def pct(real, meta):
@@ -368,8 +348,8 @@ def svg_donut(real, meta, size=80):
 
 # ─── HEADER ───────────────────────────────────────────────────────────────────
 today_str = date.today().strftime("%d/%m/%Y")
-badge_cls  = "fonte-online" if fonte_dados == "online" else "fonte-local"
-badge_txt  = "🟢 Online" if fonte_dados == "online" else "🟡 Local (cache)"
+badge_cls = "fonte-online" if fonte_dados == "online" else "fonte-local"
+badge_txt = "🟢 Online" if fonte_dados == "online" else "🟡 Local (cache)"
 
 st.markdown(f"""
 <div class="header-banner">
