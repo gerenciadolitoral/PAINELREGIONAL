@@ -450,7 +450,7 @@ oper_items = [
      f"Novos: {int(oper['cob_novos_r'])} | Inad.: {int(oper['cob_inad_r'])}<br>Real: {int(oper['cob_real'])}/{int(oper['cob_meta'])}"),
     ("🔎 Fiscalização",    oper["fisc_real"],  oper["fisc_meta"],
      f"Com RV: {int(oper['fisc_rv'])} | Sem RV: {int(oper['fisc_srv'])}<br>Real: {int(oper['fisc_real'])}/{int(oper['fisc_meta'])}"),
-    ("⏲️ Medidores",       avg_med_pct,        100,
+    ("⏲️ Medidores",      med_final,        100,
      f"Manut.: {int(oper['med_man_real'])}/{int(oper['med_man_meta'])} | Inst.: {int(oper['med_inst_real'])}/{int(oper['med_inst_meta'])}<br>"
      f"Med.: {int(oper['med_med_real'])}/{int(oper['med_med_meta'])}"),
     ("🚢 Batimetria",      oper["bati_real"],  oper["bati_meta"],
