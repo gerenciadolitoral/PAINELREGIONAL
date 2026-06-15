@@ -16,9 +16,14 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
+import base64
+from pathlib import Path
+import streamlit as st
+
 # ─── IMAGEM DE FUNDO ─────────────────────────────────────────────────────────
 _fundo_css = ""
 _fundo_path = Path(__file__).parent / "fundo.jpg"
+
 if _fundo_path.exists():
     _b64 = base64.b64encode(_fundo_path.read_bytes()).decode()
     _fundo_css = f"""
@@ -35,10 +40,13 @@ if _fundo_path.exists():
         z-index: -1;
         pointer-events: none;
     }}
-    [data-testid="stAppViewContainer"] {{
+    
+    /* Remoção do fundo das camadas principais */
+    .stApp, [data-testid="stAppViewContainer"] {{
         background: transparent !important;
     }}
-    [data-testid="stHeader"] {{
+    
+    [data-testid="stHeader"], header.stAppHeader {{
         background: transparent !important;
     }}
     """
@@ -52,7 +60,8 @@ html, body, [class*="css"] {{ font-family: 'Inter', sans-serif; }}
 
 {_fundo_css}
 
-.block-container {{
+/* Novo atributo de container blindado contra atualizações */
+[data-testid="stMainBlockContainer"] {{
     padding: 1.5rem 1.5rem 2rem 1.5rem !important;
     max-width: 1400px !important;
     min-width: 1100px !important;
