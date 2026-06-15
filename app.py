@@ -287,7 +287,7 @@ oper = dict(
     fisc_real     = cell(df_metas, 69, 4),
     fisc_rv       = cell(df_metas, 70, 4),
     fisc_srv      = cell(df_metas, 71, 4),
-     med_final  = cell(df_metas, 73, 4),
+    med_final  = cell(df_metas, 73, 4),
     med_man_meta  = cell(df_metas, 74, 2),
     med_man_real  = cell(df_metas, 74, 4),
     med_inst_meta = cell(df_metas, 75, 2),
@@ -435,7 +435,7 @@ for col, (label, real, meta, detail) in zip(cols_g, gest_items):
 # ─── NÚCLEO DE OPERAÇÃO ───────────────────────────────────────────────────────
 st.markdown('<div class="section-header">⚙️ NÚCLEO DE OPERAÇÃO</div>', unsafe_allow_html=True)
 
-avg_med_pct = (avg_med_pct = (pct(oper["med_man_real"],  oper["med_man_meta"])) + pct(oper["med_inst_real"], oper["med_inst_meta"]) + pct(oper["med_med_real"],  oper["med_med_meta"])) / 3
+avg_med_pct = oper["med_final"]
   
 
 oper_items = [
