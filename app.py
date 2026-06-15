@@ -36,7 +36,7 @@ if _fundo_path.exists():
         background-position: center;
         background-repeat: no-repeat;
         background-attachment: fixed;
-        opacity: 0.4;
+        opacity: 0.60;
         z-index: -1;
         pointer-events: none;
     }}
