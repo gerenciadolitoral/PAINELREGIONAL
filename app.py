@@ -198,8 +198,7 @@ def _safe_float(val, default=0.0):
     if val is None:
         return default
     try:
-        txt = str(val).replace("%", "").replace(",", ".").strip()
-        f = float(txt)
+        f = float(str(val).replace(",", ".").strip())
         return default if math.isnan(f) else f
     except (ValueError, TypeError):
         return default
@@ -316,7 +315,7 @@ for i in range(ACUDE_START, min(ACUDE_END, len(df_acudes))):
     if not nome:
         continue
     vol     = _safe_float(df_acudes.iloc[i, 8] if df_acudes.shape[1] > 8 else None)
-    pct_val = _safe_float(df_acudes.iloc[i, 2] if df_acudes.shape[1] > 2 else None)
+    pct_val = _safe_float(df_acudes.iloc[i, 9] if df_acudes.shape[1] > 9 else None)
     municipio = cell_str(df_acudes, i, 1)
     acudes.append({"nome": nome, "municipio": municipio, "vol": vol, "pct": pct_val})
 
