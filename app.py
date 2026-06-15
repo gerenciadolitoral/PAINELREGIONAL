@@ -440,7 +440,7 @@ avg_med_pct = (pct(oper["med_man_real"],  oper["med_man_meta"])  +
 
 oper_items = [
     ("👨‍🔧 Cor. Anomalias",  oper["anom_real"],  oper["anom_meta"],
-     f"Regional: R {int(oper['anom_r'])}/A {int(oper['anom_a'])}<br>Corrigidas: {int(oper['anom_real'])}"),
+     f"Regional: R {int(oper['anom_r'])}/A {int(oper['anom_a'])}<br>Corrigidas: {int(oper['anom_real'])}/{int(oper['anom_meta'])}"),
     ("🪙 Reg. Cobrança",   oper["cob_real"],   oper["cob_meta"],
      f"Novos: {int(oper['cob_novos_r'])} | Inad.: {int(oper['cob_inad_r'])}<br>Real: {int(oper['cob_real'])}/{int(oper['cob_meta'])}"),
     ("🔎 Fiscalização",    oper["fisc_real"],  oper["fisc_meta"],
