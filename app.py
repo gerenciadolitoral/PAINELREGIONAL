@@ -408,7 +408,7 @@ with col5:
     </div>""", unsafe_allow_html=True)
 
 # ─── NÚCLEO DE GESTÃO ─────────────────────────────────────────────────────────
-st.markdown('<div class="section-header">👥 NÚCLEO DE GESTÃO</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-header">📋 NÚCLEO DE GESTÃO</div>', unsafe_allow_html=True)
 
 gest_items = [
     ("🫗 Alocações",     gest["aloc_real"],    gest["aloc_meta"],    f"{int(gest['aloc_real'])}/{int(gest['aloc_meta'])} reuniões"),
