@@ -541,28 +541,77 @@ with col_ac:
 
 # Donut situação
 with col_sit:
-  fig_sit = go.Figure(go.Pie( 
-  labels=["Abaixo de 70%", "70% – 80%", "80% – 90%", "Acima de 90%"], 
-  values=[max(n_abaixo70, 0), max(n_70_80, 0), max(n_80_90, 0), max(n_acima90, 0)], 
-  hole=0.50, marker_colors=["#e07b00", "#f5c842", "#0b3d91", "#1a8a8a"], 
-  textinfo="none", hovertemplate="%{label}<br>%{value} açude(s)<extra></extra>",
-  ))
+
+    fig_sit = go.Figure(
+        go.Pie(
+            labels=[
+                "Acima de 90%",
+                "80% – 90%",
+                "70% – 80%",
+                "Abaixo de 70%"
+            ],
+            values=[
+                max(n_acima90, 0),
+                max(n_80_90, 0),
+                max(n_70_80, 0),
+                max(n_abaixo70, 0)
+            ],
+            hole=0.50,
+            marker_colors=[
+                "#1a8a8a",
+                "#0b3d91",
+                "#f5c842",
+                "#e07b00"
+            ],
+            textinfo="none",
+            hovertemplate="%{label}<br>%{value} açude(s)<extra></extra>",
+            sort=False
+        )
+    )
+
     fig_sit.add_annotation(
         text=f"<b>{total_acudes}</b><br><span style='font-size:9px'>açudes</span>",
-        x=0.5, y=0.5, showarrow=False,
-        font=dict(size=24, color="#0b3d91", family="Inter"),
+        x=0.5,
+        y=0.5,
+        showarrow=False,
+        font=dict(
+            size=24,
+            color="#0b3d91",
+            family="Inter"
+        ),
     )
+
     fig_sit.update_layout(
         margin=dict(l=8, r=8, t=8, b=8),
         showlegend=True,
-        legend=dict(orientation="v", x=0.5, xanchor="right", y=-0.18,
-                    font=dict(size=10, family="Inter"), itemsizing="constant"),
+        legend=dict(
+            orientation="v",
+            x=0.5,
+            xanchor="right",
+            y=-0.18,
+            font=dict(
+                size=10,
+                family="Inter"
+            ),
+            itemsizing="constant"
+        ),
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
         height=310,
     )
-    st.markdown('<div class="sit-card"><div class="sit-card-title">📊 Situação dos Açudes</div>', unsafe_allow_html=True)
-    st.plotly_chart(fig_sit, use_container_width=True, config={"displayModeBar": False}, key="donut_sit")
+
+    st.markdown(
+        '<div class="sit-card"><div class="sit-card-title">📊 Situação dos Açudes</div>',
+        unsafe_allow_html=True
+    )
+
+    st.plotly_chart(
+        fig_sit,
+        use_container_width=True,
+        config={"displayModeBar": False},
+        key="donut_sit"
+    )
+
     st.markdown('</div>', unsafe_allow_html=True)
 
 # Programação
