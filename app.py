@@ -369,6 +369,20 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
+
+
+
+total_vol    = sum(a["vol"] for a in acudes)
+total_acudes = len(acudes)
+n_acima90    = sum(1 for a in acudes if a["pct"] >= 90)
+n_80_90      = sum(1 for a in acudes if 80 <= a["pct"] < 90)
+c      = sum(1 for a in acudes if 70 <= a["pct"] < 80)
+n_abaixo70   = sum(1 for a in acudes if a["pct"] < 70)
+n_entre10_90 = sum(1 for a in acudes if 10 <= a["pct"] < 90)
+n_abaixo10   = sum(1 for a in acudes if a["pct"] < 10)
+
+
+
 # ─── KPI TOP ROW ──────────────────────────────────────────────────────────────
 col1, col2, col3, col4, col5 = st.columns(5)
 with col1:
@@ -395,16 +409,16 @@ with col3:
 with col4:
     st.markdown(f"""
     <div class="kpi-card">
-      <div class="kpi-card-label">〰️ Entre 10% e 90%</div>
-      <div class="kpi-card-value">{n_entre10_90}</div>
+      <div class="kpi-card-label">〰️ Entre 70% e 90%</div>
+      <div class="kpi-card-value">{n_80_90 + n_70_80}</div>
       <div class="kpi-card-sub">{n_entre10_90/max(total_acudes,1)*100:.1f}% do total</div>
     </div>""", unsafe_allow_html=True)
 with col5:
     cls = "warn" if n_abaixo10 > 0 else ""
     st.markdown(f"""
     <div class="kpi-card {cls}">
-      <div class="kpi-card-label">⚠️ Abaixo de 10%</div>
-      <div class="kpi-card-value {cls}">{n_abaixo10}</div>
+      <div class="kpi-card-label">⚠️ Abaixo de 70%</div>
+      <div class="kpi-card-value {cls}">{n_abaixo70}</div>
       <div class="kpi-card-sub">{n_abaixo10/max(total_acudes,1)*100:.1f}% do total</div>
     </div>""", unsafe_allow_html=True)
 
