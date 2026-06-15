@@ -308,16 +308,32 @@ for i in range(85, 95):
         break
 
 # ─── PARSE DOS AÇUDES ─────────────────────────────────────────────────────────
-# Intervalo correto: linhas 100–107 da planilha = índices 99–106 (0-based)
+# Planilha:
+# A = Açude
+# B = Município
+# C = hm³
+# D = %
+
 acudes = []
-for i in range(ACUDE_START, min(ACUDE_END, len(df_acudes))):
-    nome = cell_str(df_acudes, i, 0)
+
+for i in range(99, 107):   # linhas 100 a 107 da planilha
+    if i >= len(df_metas):
+        break
+
+    nome = cell_str(df_metas, i, 0)        # coluna A
+    municipio = cell_str(df_metas, i, 1)   # coluna B
+    vol = cell(df_metas, i, 2)             # coluna C
+    pct_val = cell(df_metas, i, 3)         # coluna D
+
     if not nome:
         continue
-    vol     = _safe_float(df_acudes.iloc[i, 8] if df_acudes.shape[1] > 8 else None)
-    pct_val = _safe_float(df_acudes.iloc[i, 9] if df_acudes.shape[1] > 9 else None)
-    municipio = cell_str(df_acudes, i, 1)
-    acudes.append({"nome": nome, "municipio": municipio, "vol": vol, "pct": pct_val})
+
+    acudes.append({
+        "nome": nome,
+        "municipio": municipio,
+        "vol": vol,
+        "pct": pct_val
+    })
 
 total_vol    = sum(a["vol"] for a in acudes)
 total_acudes = len(acudes)
