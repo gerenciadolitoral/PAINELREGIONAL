@@ -3,6 +3,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import math
 import io
+import base64
 import requests
 from pathlib import Path
 from datetime import date
@@ -15,21 +16,50 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
+# ─── IMAGEM DE FUNDO ─────────────────────────────────────────────────────────
+_fundo_css = ""
+_fundo_path = Path(__file__).parent / "fundo.jpg"
+if _fundo_path.exists():
+    _b64 = base64.b64encode(_fundo_path.read_bytes()).decode()
+    _fundo_css = f"""
+    body::before {{
+        content: '';
+        position: fixed;
+        inset: 0;
+        background-image: url('data:image/jpeg;base64,{_b64}');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        opacity: 0.35;
+        z-index: -1;
+        pointer-events: none;
+    }}
+    [data-testid="stAppViewContainer"] {{
+        background: transparent !important;
+    }}
+    [data-testid="stHeader"] {{
+        background: transparent !important;
+    }}
+    """
+
 # ─── CSS ─────────────────────────────────────────────────────────────────────
-st.markdown("""
+st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
+html, body, [class*="css"] {{ font-family: 'Inter', sans-serif; }}
 
-.block-container {
+{_fundo_css}
+
+.block-container {{
     padding: 1.5rem 1.5rem 2rem 1.5rem !important;
     max-width: 1400px !important;
     min-width: 1100px !important;
     width: 1400px !important;
-}
+}}
 
-.header-banner {
+.header-banner {{
     background: linear-gradient(135deg, #0b3d91 0%, #0d5fa6 40%, #1a8a8a 100%);
     border-radius: 0 0 16px 16px;
     padding: 1.4rem 2rem 1.2rem 2rem;
@@ -40,11 +70,11 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     flex-wrap: wrap;
     width: 100%;
     box-sizing: border-box;
-}
-.header-logo { font-size: 2.97rem; }
-.header-title { color: #ffffff; font-size: 2.295rem; font-weight: 800; line-height: 1.15; margin: 0; }
-.header-sub { color: rgba(255,255,255,0.78); font-size: 1.107rem; margin-top: 0.2rem; }
-.header-date {
+}}
+.header-logo {{ font-size: 2.97rem; }}
+.header-title {{ color: #ffffff; font-size: 2.295rem; font-weight: 800; line-height: 1.15; margin: 0; }}
+.header-sub {{ color: rgba(255,255,255,0.78); font-size: 1.107rem; margin-top: 0.2rem; }}
+.header-date {{
     margin-left: auto;
     background: rgba(255,255,255,0.15);
     border-radius: 8px;
@@ -53,9 +83,9 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     font-size: 1.107rem;
     font-weight: 600;
     white-space: nowrap;
-}
+}}
 
-.section-header {
+.section-header {{
     background: linear-gradient(90deg, #0b3d91 0%, #1a8a8a 100%);
     color: #ffffff;
     font-size: 1.188rem;
@@ -68,9 +98,9 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     display: flex;
     align-items: center;
     gap: 0.5rem;
-}
+}}
 
-.kpi-card {
+.kpi-card {{
     background: #ffffff;
     border-radius: 12px;
     padding: 1rem 1.1rem;
@@ -80,16 +110,16 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     display: flex;
     flex-direction: column;
     justify-content: center;
-}
-.kpi-card.warn  { border-left-color: #e07b00; }
-.kpi-card.good  { border-left-color: #1a8a8a; }
-.kpi-card-label { font-size: 0.999rem; color: #5a6a7e; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem; }
-.kpi-card-value { font-size: 2.295rem; font-weight: 800; color: #0b3d91; line-height: 1.1; }
-.kpi-card-value.warn { color: #e07b00; }
-.kpi-card-value.good { color: #1a8a8a; }
-.kpi-card-sub   { font-size: 0.792rem; color: #8a9ab0; margin-top: 0.2rem; }
+}}
+.kpi-card.warn  {{ border-left-color: #e07b00; }}
+.kpi-card.good  {{ border-left-color: #1a8a8a; }}
+.kpi-card-label {{ font-size: 0.999rem; color: #5a6a7e; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem; }}
+.kpi-card-value {{ font-size: 2.295rem; font-weight: 800; color: #0b3d91; line-height: 1.1; }}
+.kpi-card-value.warn {{ color: #e07b00; }}
+.kpi-card-value.good {{ color: #1a8a8a; }}
+.kpi-card-sub   {{ font-size: 0.792rem; color: #8a9ab0; margin-top: 0.2rem; }}
 
-.ind-card {
+.ind-card {{
     background: #ffffff;
     border-radius: 12px;
     padding: 0.8rem 0.75rem 0.75rem 0.75rem;
@@ -101,8 +131,8 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     gap: 0.3rem;
     height: 100%;
     box-sizing: border-box;
-}
-.ind-card-title {
+}}
+.ind-card-title {{
     font-size: 0.932rem;
     font-weight: 700;
     color: #0b3d91;
@@ -110,19 +140,19 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     letter-spacing: 0.04em;
     line-height: 1.3;
     width: 100%;
-}
-.ind-card-meta  { font-size: 0.68rem; color: #8a9ab0; }
-.ind-card-detail { font-size: 0.905rem; color: #5a6a7e; line-height: 1.5; width: 100%; }
+}}
+.ind-card-meta  {{ font-size: 0.68rem; color: #8a9ab0; }}
+.ind-card-detail {{ font-size: 0.905rem; color: #5a6a7e; line-height: 1.5; width: 100%; }}
 
-.acude-table-wrap {
+.acude-table-wrap {{
     background: #ffffff;
     border-radius: 12px;
     padding: 1rem 1.1rem;
     box-shadow: 0 2px 8px rgba(11,61,145,0.09);
-}
-.acude-table-title { font-size: 1.053rem; font-weight: 700; color: #0b3d91; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.7rem; }
+}}
+.acude-table-title {{ font-size: 1.053rem; font-weight: 700; color: #0b3d91; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.7rem; }}
 
-.sit-card {
+.sit-card {{
     background: #ffffff;
     border-radius: 12px;
     padding: 1rem 0.75rem 0.75rem 0.75rem;
@@ -132,8 +162,8 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     align-items: center;
     width: 100%;
     box-sizing: border-box;
-}
-.sit-card-title {
+}}
+.sit-card-title {{
     font-size: 1.053rem;
     font-weight: 700;
     color: #0b3d91;
@@ -142,17 +172,17 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     margin-bottom: 0.5rem;
     text-align: center;
     width: 100%;
-}
+}}
 
-.prog-card {
+.prog-card {{
     background: #ffffff;
     border-radius: 12px;
     padding: 1rem 1.1rem;
     box-shadow: 0 2px 8px rgba(11,61,145,0.09);
     height: 100%;
-}
-.prog-title { font-size: 1.053rem; font-weight: 700; color: #0b3d91; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.7rem; }
-.prog-item {
+}}
+.prog-title {{ font-size: 1.053rem; font-weight: 700; color: #0b3d91; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.7rem; }}
+.prog-item {{
     display: flex;
     align-items: flex-start;
     gap: 0.5rem;
@@ -161,22 +191,22 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     font-size: 0.88rem;
     color: #2d3a4a;
     line-height: 1.4;
-}
-.prog-item:last-child { border-bottom: none; }
-.prog-dot { color: #1a8a8a; font-size: 0.81rem; margin-top: 0.3rem; flex-shrink: 0; }
+}}
+.prog-item:last-child {{ border-bottom: none; }}
+.prog-dot {{ color: #1a8a8a; font-size: 0.81rem; margin-top: 0.3rem; flex-shrink: 0; }}
 
-.fonte-badge {
+.fonte-badge {{
     display: inline-block;
     padding: 0.15rem 0.5rem;
     border-radius: 4px;
     font-size: 0.7rem;
     font-weight: 600;
     margin-left: 0.5rem;
-}
-.fonte-online { background: #d4edda; color: #155724; }
-.fonte-local  { background: #fff3cd; color: #856404; }
+}}
+.fonte-online {{ background: #d4edda; color: #155724; }}
+.fonte-local  {{ background: #fff3cd; color: #856404; }}
 
-.js-plotly-plot .plotly .modebar { display: none !important; }
+.js-plotly-plot .plotly .modebar {{ display: none !important; }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -218,7 +248,7 @@ def load_data():
         dfs = {}
         for nome, url in SHEETS.items():
             resp = requests.get(url, timeout=15)
-            resp.encoding = "utf-8"          # ← CORRIGIDO: força encoding antes de resp.text
+            resp.encoding = "utf-8"          # força encoding antes de resp.text
             resp.raise_for_status()
             dfs[nome] = pd.read_csv(
                 io.StringIO(resp.text),
@@ -274,9 +304,9 @@ gest = dict(
 oper = dict(
     anom_meta     = cell(df_metas, 61, 2),
     anom_real     = cell(df_metas, 61, 4),
-    anom_r     = cell(df_metas, 62, 4),
-    anom_a     = cell(df_metas, 63, 4),
-    
+    anom_r        = cell(df_metas, 62, 4),
+    anom_a        = cell(df_metas, 63, 4),
+
     cob_meta      = cell(df_metas, 65, 2),
     cob_real      = cell(df_metas, 65, 4),
     cob_novos     = cell(df_metas, 66, 2),
@@ -320,19 +350,19 @@ for i in range(99, 107):   # linhas 100 a 107 da planilha
     if i >= len(df_metas):
         break
 
-    nome = cell_str(df_metas, i, 0)        # coluna A
-    municipio = cell_str(df_metas, i, 1)   # coluna B
-    vol = cell(df_metas, i, 2)             # coluna C
-    pct_val = cell(df_metas, i, 3)         # coluna D
+    nome      = cell_str(df_metas, i, 0)        # coluna A
+    municipio = cell_str(df_metas, i, 1)         # coluna B
+    vol       = cell(df_metas, i, 2)             # coluna C
+    pct_val   = cell(df_metas, i, 3)             # coluna D
 
     if not nome:
         continue
 
     acudes.append({
-        "nome": nome,
+        "nome":      nome,
         "municipio": municipio,
-        "vol": vol,
-        "pct": pct_val
+        "vol":       vol,
+        "pct":       pct_val,
     })
 
 total_vol    = sum(a["vol"] for a in acudes)
@@ -346,7 +376,8 @@ n_abaixo10   = sum(1 for a in acudes if a["pct"] < 10)
 
 # ─── HELPERS DE VISUALIZAÇÃO ──────────────────────────────────────────────────
 def pct(real, meta):
-    if meta == 0: return 0
+    if meta == 0:
+        return 0
     return round(real / meta * 100, 1)
 
 def svg_donut(real, meta, size=80):
@@ -384,20 +415,6 @@ st.markdown(f"""
   <div class="header-date">📅 {today_str} &nbsp;|&nbsp; COGERH</div>
 </div>
 """, unsafe_allow_html=True)
-
-
-
-
-total_vol    = sum(a["vol"] for a in acudes)
-total_acudes = len(acudes)
-n_acima90    = sum(1 for a in acudes if a["pct"] >= 90)
-n_80_90      = sum(1 for a in acudes if 80 <= a["pct"] < 90)
-c      = sum(1 for a in acudes if 70 <= a["pct"] < 80)
-n_abaixo70   = sum(1 for a in acudes if a["pct"] < 70)
-n_entre10_90 = sum(1 for a in acudes if 10 <= a["pct"] < 90)
-n_abaixo10   = sum(1 for a in acudes if a["pct"] < 10)
-
-
 
 # ─── KPI TOP ROW ──────────────────────────────────────────────────────────────
 col1, col2, col3, col4, col5 = st.columns(5)
@@ -465,9 +482,6 @@ for col, (label, real, meta, detail) in zip(cols_g, gest_items):
 # ─── NÚCLEO DE OPERAÇÃO ───────────────────────────────────────────────────────
 st.markdown('<div class="section-header">⚙️ NÚCLEO DE OPERAÇÃO</div>', unsafe_allow_html=True)
 
-avg_med_pct = oper["med_final"]
-  
-
 oper_items = [
     ("👨‍🔧 Cor. Anomalias",  oper["anom_real"],  oper["anom_meta"],
      f"Regional: R {int(oper['anom_r'])}/A {int(oper['anom_a'])}<br>Corrigidas: {int(oper['anom_real'])}/{int(oper['anom_meta'])}"),
@@ -475,7 +489,7 @@ oper_items = [
      f"Novos: {int(oper['cob_novos_r'])} | Inad.: {int(oper['cob_inad_r'])}<br>Real: {int(oper['cob_real'])}/{int(oper['cob_meta'])}"),
     ("🔎 Fiscalização",    oper["fisc_real"],  oper["fisc_meta"],
      f"Com RV: {int(oper['fisc_rv'])} | Sem RV: {int(oper['fisc_srv'])}<br>Real: {int(oper['fisc_real'])}/{int(oper['fisc_meta'])}"),
-     ("⏲️ Medidores",       oper['med_final'],        100,
+    ("⏲️ Medidores",       oper["med_final"],  100,
      f"Manut.: {int(oper['med_man_real'])}/{int(oper['med_man_meta'])} | Inst.: {int(oper['med_inst_real'])}/{int(oper['med_inst_meta'])}<br>"
      f"Med.: {int(oper['med_med_real'])}/{int(oper['med_med_meta'])}"),
     ("🚢 Batimetria",      oper["bati_real"],  oper["bati_meta"],
@@ -541,31 +555,25 @@ with col_ac:
 
 # Donut situação
 with col_sit:
-
     fig_sit = go.Figure(
         go.Pie(
             labels=[
                 "Acima de 90%",
                 "80% – 90%",
                 "70% – 80%",
-                "Abaixo de 70%"
+                "Abaixo de 70%",
             ],
             values=[
                 max(n_acima90, 0),
                 max(n_80_90, 0),
                 max(n_70_80, 0),
-                max(n_abaixo70, 0)
+                max(n_abaixo70, 0),
             ],
             hole=0.50,
-            marker_colors=[
-                "#1a8a8a",
-                "#0b3d91",
-                "#f5c842",
-                "#e07b00"
-            ],
+            marker_colors=["#1a8a8a", "#0b3d91", "#f5c842", "#e07b00"],
             textinfo="none",
             hovertemplate="%{label}<br>%{value} açude(s)<extra></extra>",
-            sort=False
+            sort=False,
         )
     )
 
@@ -574,11 +582,7 @@ with col_sit:
         x=0.5,
         y=0.5,
         showarrow=False,
-        font=dict(
-            size=24,
-            color="#0b3d91",
-            family="Inter"
-        ),
+        font=dict(size=24, color="#0b3d91", family="Inter"),
     )
 
     fig_sit.update_layout(
@@ -589,11 +593,8 @@ with col_sit:
             x=0.5,
             xanchor="right",
             y=-0.18,
-            font=dict(
-                size=10,
-                family="Inter"
-            ),
-            itemsizing="constant"
+            font=dict(size=10, family="Inter"),
+            itemsizing="constant",
         ),
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
@@ -602,17 +603,17 @@ with col_sit:
 
     st.markdown(
         '<div class="sit-card"><div class="sit-card-title">📊 Situação dos Açudes</div>',
-        unsafe_allow_html=True
+        unsafe_allow_html=True,
     )
 
     st.plotly_chart(
         fig_sit,
         use_container_width=True,
         config={"displayModeBar": False},
-        key="donut_sit"
+        key="donut_sit",
     )
 
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # Programação
 with col_prog:
