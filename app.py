@@ -355,7 +355,7 @@ for i in range(85, 95):
 
 acudes = []
 
-for i in range(99, 106):   # linhas 100 a 107 da planilha
+for i in range(99, 107):   # linhas 100 a 107 da planilha
     if i >= len(df_metas):
         break
 
@@ -374,8 +374,8 @@ for i in range(99, 106):   # linhas 100 a 107 da planilha
         "pct":       pct_val,
     })
 
-total_vol    = cell(df_metas, 107, 2)
-total_acudes = len(acudes)
+total_vol    = cell(df_metas, 108, 2)
+total_acudes = cell(df_metas, 108, 3)
 n_acima90    = sum(1 for a in acudes if a["pct"] >= 90)
 n_80_90      = sum(1 for a in acudes if 80 <= a["pct"] < 90)
 n_70_80      = sum(1 for a in acudes if 70 <= a["pct"] < 80)
