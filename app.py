@@ -231,7 +231,7 @@ SHEETS = {
 
 # Intervalo dos açudes na planilha: A100:A107 → índices 99–106 (0-based)
 ACUDE_START = 99
-ACUDE_END   = 107  # exclusive
+ACUDE_END   = 106  # exclusive
 
 def _safe_float(val, default=0.0):
     if val is None:
@@ -374,7 +374,7 @@ for i in range(99, 106):   # linhas 100 a 107 da planilha
         "pct":       pct_val,
     })
 
-total_vol    = sum(a["vol"] for a in acudes)
+total_vol    = cell(df_metas, 107, 2)
 total_acudes = len(acudes)
 n_acima90    = sum(1 for a in acudes if a["pct"] >= 90)
 n_80_90      = sum(1 for a in acudes if 80 <= a["pct"] < 90)
