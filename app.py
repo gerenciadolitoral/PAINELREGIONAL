@@ -309,7 +309,7 @@ gest = dict(
     aval_meta     = cell(df_metas, 48, 2),
     aval_real     = cell(df_metas, 48, 4),
     reuord     = cell(df_metas, 2, 4),
-    reuex    = cell(df_metas, 6, 4),
+    reuex    = cell(df_metas, 7, 4),
 )
 
 oper = dict(
