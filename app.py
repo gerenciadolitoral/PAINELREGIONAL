@@ -355,7 +355,7 @@ for i in range(85, 95):
 
 acudes = []
 
-for i in range(99, 107):   # linhas 100 a 107 da planilha
+for i in range(99, 106):   # linhas 100 a 107 da planilha
     if i >= len(df_metas):
         break
 
