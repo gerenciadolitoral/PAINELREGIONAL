@@ -36,12 +36,9 @@ if _fundo_path.exists():
         z-index: -1;
         pointer-events: none;
     }}
-    
-    /* Remoção do fundo das camadas principais */
     .stApp, [data-testid="stAppViewContainer"] {{
         background: transparent !important;
     }}
-    
     [data-testid="stHeader"], header.stAppHeader {{
         background: transparent !important;
     }}
@@ -56,7 +53,6 @@ html, body, [class*="css"] {{ font-family: 'Inter', sans-serif; }}
 
 {_fundo_css}
 
-/* Novo atributo de container blindado contra atualizações */
 [data-testid="stMainBlockContainer"] {{
     padding: 1.5rem 1.5rem 2rem 1.5rem !important;
     max-width: 1400px !important;
@@ -216,19 +212,15 @@ html, body, [class*="css"] {{ font-family: 'Inter', sans-serif; }}
 """, unsafe_allow_html=True)
 
 # ─── CONFIGURAÇÃO DA FONTE DE DADOS ──────────────────────────────────────────
-SHEET_ID  = "1kte6Ys9vgzw7a0Z1PDXkxf6VOX9KHWlRCXp7P-7RSi4"
+SHEET_ID   = "1kte6Ys9vgzw7a0Z1PDXkxf6VOX9KHWlRCXp7P-7RSi4"
 XLSX_LOCAL = Path(__file__).parent / "painel da grlitoral.xlsx"
 
-# Correção: O dicionário agora puxa a aba de programação exatamente pelo gid fornecido
 SHEETS = {
     "metas":  f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&sheet=metas",
     "açudes": f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&sheet=a%C3%A7udes",
+    # gid correto da aba de programação
     "prog":   f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&gid=507430155",
 }
-
-# Intervalo dos açudes na planilha: A100:A107 → índices 99–106 (0-based)
-ACUDE_START = 99
-ACUDE_END   = 107  # exclusive
 
 def _safe_float(val, default=0.0):
     if val is None:
@@ -249,7 +241,7 @@ def load_data():
         dfs = {}
         for nome, url in SHEETS.items():
             resp = requests.get(url, timeout=15)
-            resp.encoding = "utf-8"          # força encoding antes de resp.text
+            resp.encoding = "utf-8"
             resp.raise_for_status()
             dfs[nome] = pd.read_csv(
                 io.StringIO(resp.text),
@@ -258,7 +250,6 @@ def load_data():
                 keep_default_na=False,
             )
         return dfs["metas"], dfs["açudes"], dfs.get("prog", pd.DataFrame()), "online"
-
     except Exception:
         try:
             df_m = pd.read_excel(XLSX_LOCAL, sheet_name="metas",  header=None, dtype=str)
@@ -300,8 +291,8 @@ gest = dict(
     acomp_real    = cell(df_metas, 38, 4),
     aval_meta     = cell(df_metas, 48, 2),
     aval_real     = cell(df_metas, 48, 4),
-    reuord        = cell(df_metas, 2, 4),
-    reuex         = cell(df_metas, 7, 4),
+    reuord        = cell(df_metas,  2, 4),
+    reuex         = cell(df_metas,  7, 4),
 )
 
 oper = dict(
@@ -309,7 +300,6 @@ oper = dict(
     anom_real     = cell(df_metas, 61, 4),
     anom_r        = cell(df_metas, 62, 4),
     anom_a        = cell(df_metas, 63, 4),
-
     cob_meta      = cell(df_metas, 65, 2),
     cob_real      = cell(df_metas, 65, 4),
     cob_novos     = cell(df_metas, 66, 2),
@@ -333,25 +323,16 @@ oper = dict(
 
 # ─── PARSE DOS AÇUDES ─────────────────────────────────────────────────────────
 acudes = []
-
-for i in range(99, 107):   # linhas 100 a 107 da planilha
+for i in range(99, 107):
     if i >= len(df_metas):
         break
-
-    nome      = cell_str(df_metas, i, 0)         # coluna A
-    municipio = cell_str(df_metas, i, 1)         # coluna B
-    vol       = cell(df_metas, i, 2)             # coluna C
-    pct_val   = cell(df_metas, i, 3)             # coluna D
-
+    nome      = cell_str(df_metas, i, 0)
+    municipio = cell_str(df_metas, i, 1)
+    vol       = cell(df_metas, i, 2)
+    pct_val   = cell(df_metas, i, 3)
     if not nome:
         continue
-
-    acudes.append({
-        "nome":      nome,
-        "municipio": municipio,
-        "vol":       vol,
-        "pct":       pct_val,
-    })
+    acudes.append({"nome": nome, "municipio": municipio, "vol": vol, "pct": pct_val})
 
 total_vol    = sum(a["vol"] for a in acudes)
 total_acudes = len(acudes)
@@ -385,12 +366,15 @@ def svg_donut(real, meta, size=80):
         font-family="Inter,sans-serif" font-size="16.2" font-weight="800" fill="{color}">{p:.0f}%</text>
 </svg>"""
 
-# ─── MÁQUINA DO TEMPO (SESSÃO) ────────────────────────────────────────────────
+# ─── NAVEGAÇÃO TEMPORAL (SESSÃO) ──────────────────────────────────────────────
 if "prog_offset" not in st.session_state:
     st.session_state.prog_offset = 0
 
 def navegar_dias(delta):
     st.session_state.prog_offset += delta
+
+def voltar_hoje():
+    st.session_state.prog_offset = 0
 
 # ─── HEADER ───────────────────────────────────────────────────────────────────
 today_str = date.today().strftime("%d/%m/%Y")
@@ -552,102 +536,78 @@ with col_ac:
 with col_sit:
     fig_sit = go.Figure(
         go.Pie(
-            labels=[
-                "Acima de 90%",
-                "80% – 90%",
-                "70% – 80%",
-                "Abaixo de 70%",
-            ],
-            values=[
-                max(n_acima90, 0),
-                max(n_80_90, 0),
-                max(n_70_80, 0),
-                max(n_abaixo70, 0),
-            ],
+            labels=["Acima de 90%", "80% – 90%", "70% – 80%", "Abaixo de 70%"],
+            values=[max(n_acima90,0), max(n_80_90,0), max(n_70_80,0), max(n_abaixo70,0)],
             hole=0.50,
-            marker_colors=[ "#0b3d91", "#1a8a8a", "#f5c842", "#e07b00"],
+            marker_colors=["#0b3d91", "#1a8a8a", "#f5c842", "#e07b00"],
             textinfo="none",
             hovertemplate="%{label}<br>%{value} açude(s)<extra></extra>",
             sort=False,
         )
     )
-
     fig_sit.add_annotation(
         text=f"<b>{total_acudes}</b><br><span style='font-size:9px'>açudes</span>",
-        x=0.5,
-        y=0.5,
-        showarrow=False,
+        x=0.5, y=0.5, showarrow=False,
         font=dict(size=24, color="#0b3d91", family="Inter"),
     )
-
     fig_sit.update_layout(
         margin=dict(l=8, r=8, t=8, b=8),
         showlegend=True,
-        legend=dict(
-            orientation="v",
-            x=0.5,
-            xanchor="right",
-            y=-0.18,
-            font=dict(size=10, family="Inter"),
-            itemsizing="constant",
-        ),
+        legend=dict(orientation="v", x=0.5, xanchor="right", y=-0.18,
+                    font=dict(size=10, family="Inter"), itemsizing="constant"),
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
         height=310,
     )
-
-    st.markdown(
-        '<div class="sit-card"><div class="sit-card-title">📊 Situação dos Açudes</div>',
-        unsafe_allow_html=True,
-    )
-
-    st.plotly_chart(
-        fig_sit,
-        use_container_width=True,
-        config={"displayModeBar": False},
-        key="donut_sit",
-    )
-
+    st.markdown('<div class="sit-card"><div class="sit-card-title">📊 Situação dos Açudes</div>', unsafe_allow_html=True)
+    st.plotly_chart(fig_sit, use_container_width=True, config={"displayModeBar": False}, key="donut_sit")
     st.markdown("</div>", unsafe_allow_html=True)
 
-# Programação com Máquina do Tempo
+# ─── PROGRAMAÇÃO COM NAVEGAÇÃO TEMPORAL ──────────────────────────────────────
 with col_prog:
-    # 1. Calcula a data exata que estamos visualizando
-    data_alvo = date.today() + timedelta(days=st.session_state.prog_offset)
+    data_alvo     = date.today() + timedelta(days=st.session_state.prog_offset)
     data_alvo_str = data_alvo.strftime("%d/%m/%Y")
-    
-    # 2. Mapeia a aba 'prog' (Coluna A = Data, Coluna E = Programação)
+
+    # Coluna A = data, Coluna E (índice 4) = texto da atividade
+    # ATENÇÃO: se a estrutura da planilha mudar, ajustar o índice abaixo
+    COL_ATIVIDADE = 4
+
     prog_do_dia = []
     if not df_prog.empty:
         for _, row in df_prog.iterrows():
             try:
-                row_data = _safe_str(row.iloc[0])  # Coluna A
-                row_ativ = _safe_str(row.iloc[4])  # Coluna E
-                
-                # Varredura dupla: aceita data na planilha tanto como DD/MM/YYYY quanto YYYY-MM-DD
+                row_data = _safe_str(row.iloc[0])
+                row_ativ = _safe_str(row.iloc[COL_ATIVIDADE])
                 if data_alvo_str in row_data or data_alvo.strftime("%Y-%m-%d") in row_data:
                     if row_ativ:
                         prog_do_dia.append(row_ativ)
             except Exception:
                 pass
-    
-    # 3. Renderiza o HTML das atividades do dia encontrado
+
     if prog_do_dia:
-        items_html = "".join(f'<div class="prog-item"><span class="prog-dot">●</span><span>{t}</span></div>' for t in prog_do_dia)
+        items_html = "".join(
+            f'<div class="prog-item"><span class="prog-dot">●</span><span>{t}</span></div>'
+            for t in prog_do_dia
+        )
     else:
-        items_html = f'<div class="prog-item"><span style="color:#8a9ab0">Nenhuma programação registrada para {data_alvo_str}.</span></div>'
-    
+        items_html = f'<div class="prog-item"><span style="color:#8a9ab0">Nenhuma programação para {data_alvo_str}.</span></div>'
+
     st.markdown(f"""
     <div class="prog-card">
       <div class="prog-title">📅 Programação — {data_alvo_str}</div>
       {items_html}
     </div>""", unsafe_allow_html=True)
-    
-    # 4. Injeta os botões de controle temporal
+
     st.markdown("<div style='margin-top:0.5rem'></div>", unsafe_allow_html=True)
-    c_prev, c_next = st.columns(2)
+
+    # Botões de navegação: Anterior | Hoje | Próximo
+    c_prev, c_hoje, c_next = st.columns(3)
     with c_prev:
         st.button("⬅️ Anterior", on_click=navegar_dias, args=(-1,), use_container_width=True)
+    with c_hoje:
+        # Desabilita "Hoje" quando já está no dia atual (offset == 0)
+        st.button("📅 Hoje", on_click=voltar_hoje, use_container_width=True,
+                  disabled=(st.session_state.prog_offset == 0))
     with c_next:
         st.button("Próximo ➡️", on_click=navegar_dias, args=(1,), use_container_width=True)
 
