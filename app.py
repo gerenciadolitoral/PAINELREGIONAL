@@ -1,10 +1,3 @@
-Você tem toda a razão, deixei a engrenagem antiga conectada no duto errado! Pesquisei aqui as melhores práticas para garantir que a requisição puxe exatamente a aba correta pelo `gid` ao invés do nome, evitando qualquer falha de sincronia.
-
-Ao invés de chamar `sheet=prog`, a URL de exportação deve apontar cirurgicamente para o `gid=507430155`.
-
-Aqui está o código completo e corrigido. Substitua tudo no seu arquivo:
-
-```python
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
@@ -665,5 +658,3 @@ st.markdown(f"""
   COGERH – Companhia de Gestão dos Recursos Hídricos &nbsp;|&nbsp; GR Litoral / Itapipoca &nbsp;|&nbsp;
   Fonte: {fonte_label} &nbsp;|&nbsp; Cache: 5 min
 </div>""", unsafe_allow_html=True)
-
-```
