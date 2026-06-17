@@ -10,7 +10,7 @@ from datetime import date
 
 # ─── PAGE CONFIG ────────────────────────────────────────────────────────────
 st.set_page_config(
-    page_title="Dashboard Estratégico – GR Litoral",
+    page_title="Painel Estratégico – Gerência do Litoral",
     page_icon="💧",
     layout="wide",
     initial_sidebar_state="collapsed",
