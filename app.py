@@ -1,3 +1,10 @@
+Você tem toda a razão, deixei a engrenagem antiga conectada no duto errado! Pesquisei aqui as melhores práticas para garantir que a requisição puxe exatamente a aba correta pelo `gid` ao invés do nome, evitando qualquer falha de sincronia.
+
+Ao invés de chamar `sheet=prog`, a URL de exportação deve apontar cirurgicamente para o `gid=507430155`.
+
+Aqui está o código completo e corrigido. Substitua tudo no seu arquivo:
+
+```python
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
@@ -6,7 +13,7 @@ import io
 import base64
 import requests
 from pathlib import Path
-from datetime import date
+from datetime import date, timedelta
 
 # ─── PAGE CONFIG ────────────────────────────────────────────────────────────
 st.set_page_config(
@@ -15,10 +22,6 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="collapsed",
 )
-
-import base64
-from pathlib import Path
-import streamlit as st
 
 # ─── IMAGEM DE FUNDO ─────────────────────────────────────────────────────────
 _fundo_css = ""
@@ -223,10 +226,11 @@ html, body, [class*="css"] {{ font-family: 'Inter', sans-serif; }}
 SHEET_ID  = "1kte6Ys9vgzw7a0Z1PDXkxf6VOX9KHWlRCXp7P-7RSi4"
 XLSX_LOCAL = Path(__file__).parent / "painel da grlitoral.xlsx"
 
+# Correção: O dicionário agora puxa a aba de programação exatamente pelo gid fornecido
 SHEETS = {
     "metas":  f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&sheet=metas",
     "açudes": f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&sheet=a%C3%A7udes",
-    "prog":   f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&sheet=prog",
+    "prog":   f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&gid=507430155",
 }
 
 # Intervalo dos açudes na planilha: A100:A107 → índices 99–106 (0-based)
@@ -248,11 +252,6 @@ def _safe_str(val):
 
 @st.cache_data(ttl=300)
 def load_data():
-    """
-    Tenta carregar dados do Google Sheets online.
-    Se falhar, usa o xlsx local como fallback.
-    Retorna (df_metas, df_acudes, df_prog, fonte).
-    """
     try:
         dfs = {}
         for nome, url in SHEETS.items():
@@ -308,8 +307,8 @@ gest = dict(
     acomp_real    = cell(df_metas, 38, 4),
     aval_meta     = cell(df_metas, 48, 2),
     aval_real     = cell(df_metas, 48, 4),
-    reuord     = cell(df_metas, 2, 4),
-    reuex    = cell(df_metas, 7, 4),
+    reuord        = cell(df_metas, 2, 4),
+    reuex         = cell(df_metas, 7, 4),
 )
 
 oper = dict(
@@ -339,29 +338,14 @@ oper = dict(
     bati_real     = cell(df_metas, 78, 4),
 )
 
-# Programação de hoje (linhas 85–94, col A)
-prog_hoje = []
-for i in range(85, 95):
-    s = cell_str(df_metas, i, 0)
-    if s and s.upper() not in ("PROGRAMAÇÃO DE HOJE",):
-        prog_hoje.append(s)
-    if len(prog_hoje) >= 8:
-        break
-
 # ─── PARSE DOS AÇUDES ─────────────────────────────────────────────────────────
-# Planilha:
-# A = Açude
-# B = Município
-# C = hm³
-# D = %
-
 acudes = []
 
 for i in range(99, 107):   # linhas 100 a 107 da planilha
     if i >= len(df_metas):
         break
 
-    nome      = cell_str(df_metas, i, 0)        # coluna A
+    nome      = cell_str(df_metas, i, 0)         # coluna A
     municipio = cell_str(df_metas, i, 1)         # coluna B
     vol       = cell(df_metas, i, 2)             # coluna C
     pct_val   = cell(df_metas, i, 3)             # coluna D
@@ -407,6 +391,13 @@ def svg_donut(real, meta, size=80):
   <text x="{cx}" y="{cy}" text-anchor="middle" dominant-baseline="central"
         font-family="Inter,sans-serif" font-size="16.2" font-weight="800" fill="{color}">{p:.0f}%</text>
 </svg>"""
+
+# ─── MÁQUINA DO TEMPO (SESSÃO) ────────────────────────────────────────────────
+if "prog_offset" not in st.session_state:
+    st.session_state.prog_offset = 0
+
+def navegar_dias(delta):
+    st.session_state.prog_offset += delta
 
 # ─── HEADER ───────────────────────────────────────────────────────────────────
 today_str = date.today().strftime("%d/%m/%Y")
@@ -626,17 +617,46 @@ with col_sit:
 
     st.markdown("</div>", unsafe_allow_html=True)
 
-# Programação
+# Programação com Máquina do Tempo
 with col_prog:
-    items_html = "".join(
-        f'<div class="prog-item"><span class="prog-dot">●</span><span>{t}</span></div>'
-        for t in prog_hoje
-    ) or '<div class="prog-item"><span style="color:#8a9ab0">Nenhuma programação registrada para hoje.</span></div>'
+    # 1. Calcula a data exata que estamos visualizando
+    data_alvo = date.today() + timedelta(days=st.session_state.prog_offset)
+    data_alvo_str = data_alvo.strftime("%d/%m/%Y")
+    
+    # 2. Mapeia a aba 'prog' (Coluna A = Data, Coluna E = Programação)
+    prog_do_dia = []
+    if not df_prog.empty:
+        for _, row in df_prog.iterrows():
+            try:
+                row_data = _safe_str(row.iloc[0])  # Coluna A
+                row_ativ = _safe_str(row.iloc[4])  # Coluna E
+                
+                # Varredura dupla: aceita data na planilha tanto como DD/MM/YYYY quanto YYYY-MM-DD
+                if data_alvo_str in row_data or data_alvo.strftime("%Y-%m-%d") in row_data:
+                    if row_ativ:
+                        prog_do_dia.append(row_ativ)
+            except Exception:
+                pass
+    
+    # 3. Renderiza o HTML das atividades do dia encontrado
+    if prog_do_dia:
+        items_html = "".join(f'<div class="prog-item"><span class="prog-dot">●</span><span>{t}</span></div>' for t in prog_do_dia)
+    else:
+        items_html = f'<div class="prog-item"><span style="color:#8a9ab0">Nenhuma programação registrada para {data_alvo_str}.</span></div>'
+    
     st.markdown(f"""
     <div class="prog-card">
-      <div class="prog-title">📅 Programação — {today_str}</div>
+      <div class="prog-title">📅 Programação — {data_alvo_str}</div>
       {items_html}
     </div>""", unsafe_allow_html=True)
+    
+    # 4. Injeta os botões de controle temporal
+    st.markdown("<div style='margin-top:0.5rem'></div>", unsafe_allow_html=True)
+    c_prev, c_next = st.columns(2)
+    with c_prev:
+        st.button("⬅️ Anterior", on_click=navegar_dias, args=(-1,), use_container_width=True)
+    with c_next:
+        st.button("Próximo ➡️", on_click=navegar_dias, args=(1,), use_container_width=True)
 
 # ─── FOOTER ───────────────────────────────────────────────────────────────────
 fonte_label = "Google Sheets (online)" if fonte_dados == "online" else "arquivo local (xlsx)"
@@ -645,3 +665,5 @@ st.markdown(f"""
   COGERH – Companhia de Gestão dos Recursos Hídricos &nbsp;|&nbsp; GR Litoral / Itapipoca &nbsp;|&nbsp;
   Fonte: {fonte_label} &nbsp;|&nbsp; Cache: 5 min
 </div>""", unsafe_allow_html=True)
+
+```
