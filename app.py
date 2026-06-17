@@ -10,7 +10,7 @@ from datetime import date
 
 # ─── PAGE CONFIG ────────────────────────────────────────────────────────────
 st.set_page_config(
-    page_title="Painel Estratégico – Gerência do Litoral",
+    page_title="Painel Estratégico – GRLitoral",
     page_icon="💧",
     layout="wide",
     initial_sidebar_state="collapsed",
@@ -417,7 +417,7 @@ st.markdown(f"""
 <div class="header-banner">
   <div class="header-logo">💧</div>
   <div>
-    <div class="header-title">Dashboard Estratégico da Gerência Regional</div>
+    <div class="header-title">Painel Estratégico da Gerência do Litoral</div>
     <div class="header-sub">
       Monitoramento integrado dos indicadores de gestão e operação – GR Litoral / Itapipoca
       <span class="fonte-badge {badge_cls}">{badge_txt}</span>
