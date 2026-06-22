@@ -567,11 +567,13 @@ with col_sit:
 with col_prog:
     data_alvo     = date.today() + timedelta(days=st.session_state.prog_offset)
     data_alvo_str = data_alvo.strftime("%d/%m/%Y")
-
+    # Dia da semana em PT-BR, sem depender de locale do sistema (weekday(): 0=segunda ... 6=domingo)
+    DIAS_SEMANA   = ["Segunda-feira", "Terça-feira", "Quarta-feira",
+                      "Quinta-feira", "Sexta-feira", "Sábado", "Domingo"]
+    dia_semana_str = DIAS_SEMANA[data_alvo.weekday()]
     # Coluna A = data, Coluna E (índice 4) = texto da atividade
     # ATENÇÃO: se a estrutura da planilha mudar, ajustar o índice abaixo
     COL_ATIVIDADE = 4
-
     prog_do_dia = []
     if not df_prog.empty:
         for _, row in df_prog.iterrows():
@@ -583,7 +585,6 @@ with col_prog:
                         prog_do_dia.append(row_ativ)
             except Exception:
                 pass
-
     if prog_do_dia:
         items_html = "".join(
             f'<div class="prog-item"><span class="prog-dot">●</span><span>{t}</span></div>'
@@ -591,15 +592,12 @@ with col_prog:
         )
     else:
         items_html = f'<div class="prog-item"><span style="color:#8a9ab0">Nenhuma programação para {data_alvo_str}.</span></div>'
-
     st.markdown(f"""
     <div class="prog-card">
-      <div class="prog-title">📅 Programação — {data_alvo_str}</div>
+      <div class="prog-title">📅 Programação — {data_alvo_str} - {dia_semana_str}</div>
       {items_html}
     </div>""", unsafe_allow_html=True)
-
     st.markdown("<div style='margin-top:0.5rem'></div>", unsafe_allow_html=True)
-
     # Botões de navegação: Anterior | Hoje | Próximo
     c_prev, c_hoje, c_next = st.columns(3)
     with c_prev:
