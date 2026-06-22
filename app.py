@@ -278,9 +278,9 @@ def cell_str(df, row, col):
 # ─── PARSE DOS INDICADORES ────────────────────────────────────────────────────
 gest = dict(
     cbh_ord_meta  = cell(df_metas,  2, 2),
-    cbh_ord_real  = cell(df_metas,  3, 4),
+    cbh_ord_real  = cell(df_metas,  2, 5),
     cbh_ext_meta  = cell(df_metas,  7, 2),
-    cbh_ext_real  = cell(df_metas,  8, 4),
+    cbh_ext_real  = cell(df_metas,  7, 5),
     cbh_for_meta  = cell(df_metas, 13, 2),
     cbh_for_real  = cell(df_metas, 13, 4),
     cap_meta      = cell(df_metas, 18, 2),
