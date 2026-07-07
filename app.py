@@ -695,7 +695,7 @@ CATEGORIAS = [
     ("Faturamento",      ["faturamento", "leitura", "hidrômetro", "hidrometro"],    "#27AE60"),
     ("Instrumentação",   ["instrumentação", "instrumentacao", "piezômetro", "piezometro", "percolação", "percolacao"], "#16A085"),
     ("Monitoramento",    ["monitoramento", "captação", "captacao", "perenização", "perenizacao", "sigerh"], "#2980B9"),
-    ("Vistoria/Fiscaliz.", ["vistoria", "fiscalização", "fiscalizacao", "inspeção", "inspecao"], "#BDC3C7"),
+    ("Vistoria/Fiscaliz.", ["vistoria", "fiscalização", "fiscalizacao", "inspeção", "inspecao"], "#F4A460"),
     ("Coleta/Água",      ["coleta", "análise qualitativa", "analise qualitativa", "sonda"], "#3498DB"),
     ("Diárias/Admin.",   ["diária", "diaria", "protheus", "estoque", "frota", "almoxarifado", "combustível", "combustivel", "logistico","logístico"], "#20B2AA"),
     ("Relatório/Ata",    ["relatório", "relatorio", "ata", "parecer", "diagnóstico", "diagnostico"], "#8E44AD"),
