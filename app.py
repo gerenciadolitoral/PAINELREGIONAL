@@ -692,7 +692,7 @@ CATEGORIAS = [
     ("Mobilização",      ["mobilização", "mobilizacao"],                            "#E67E22"),
     ("Publicação/Story", ["publicar", "publicação", "publicacao", "story", "post", "reels", "matéria", "materia", "Parabenizar", "parabenizar"], "#9B59B6"),
     ("Gravação",         ["gravação", "gravacao", "vídeo", "video"],                "#1ABC9C"),
-    ("Faturamento",      ["faturamento", "leitura", "hidrômetro", "hidrometro"],    "#27AE60"),
+    ("Faturamento",      ["faturamento", "leitura", "hidrômetro", "consumo", "hidrometro"],    "#27AE60"),
     ("Instrumentação",   ["instrumentação", "instrumentacao", "piezômetro", "piezometro", "percolação", "percolacao"], "#16A085"),
     ("Monitoramento",    ["monitoramento", "captação", "captacao", "perenização", "perenizacao", "sigerh"], "#2980B9"),
     ("Vistoria/Fiscaliz.", ["vistoria", "fiscalização", "fiscalizacao", "inspeção", "inspecao"], "#F4A460"),
