@@ -1,12 +1,14 @@
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
+import calendar
 import math
 import io
 import base64
 import requests
 from pathlib import Path
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
+from io import StringIO
 
 # ─── PAGE CONFIG ────────────────────────────────────────────────────────────
 st.set_page_config(
@@ -208,6 +210,36 @@ html, body, [class*="css"] {{ font-family: 'Inter', sans-serif; }}
 .fonte-local  {{ background: #fff3cd; color: #856404; }}
 
 .js-plotly-plot .plotly .modebar {{ display: none !important; }}
+
+/* ---- Estilos do calendário (abaixo) ---- */
+.cal-header {{background:#1c1c1c; color:white; padding:14px 18px; border-radius:8px 8px 0 0;
+             display:flex; justify-content:space-between; align-items:center;}}
+.cal-title {{font-size:1.6rem; font-weight:800; letter-spacing:1px; margin:0;}}
+.dia-semana-label {{text-align:center; font-weight:800; padding:6px; border-radius:6px;
+                    margin-bottom:4px; font-size:0.8rem;}}
+.day-card {{
+    border:2px solid #ddd; border-radius:6px; padding:6px;
+    height:170px; overflow-y:auto; box-sizing:border-box;
+}}
+.day-num {{font-weight:700; font-size:0.95rem; margin-bottom:4px;}}
+.week-card {{
+    border:1px solid #ccc; border-radius:0 0 6px 6px;
+    padding:6px; box-sizing:border-box;
+    height:420px; overflow-y:auto;
+}}
+.week-card-hoje {{ border:3px solid #F5A623; }}
+.week-header {{
+    text-align:center; padding:6px; border-radius:6px 6px 0 0;
+    font-weight:800; color:white;
+}}
+.week-header .data-sub {{ font-size:0.75rem; font-weight:600; }}
+.atividade-pill {{
+    border-radius:5px; padding:4px 7px; margin-bottom:4px;
+    font-size:0.72rem; line-height:1.3; color:white;
+    word-wrap:break-word; overflow-wrap:break-word;
+}}
+.sem-atividade {{ font-size:0.72rem; color:#999; font-style:italic; }}
+.mais-info {{ font-size:0.68rem; color:#888; }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -568,11 +600,10 @@ with col_prog:
     data_alvo     = date.today() + timedelta(days=st.session_state.prog_offset)
     data_alvo_str = data_alvo.strftime("%d/%m/%Y")
     # Dia da semana em PT-BR, sem depender de locale do sistema (weekday(): 0=segunda ... 6=domingo)
-    DIAS_SEMANA   = ["Segunda-feira", "Terça-feira", "Quarta-feira",
-                      "Quinta-feira", "Sexta-feira", "Sábado", "Domingo"]
-    dia_semana_str = DIAS_SEMANA[data_alvo.weekday()]
+    DIAS_SEMANA_EXT = ["Segunda-feira", "Terça-feira", "Quarta-feira",
+                        "Quinta-feira", "Sexta-feira", "Sábado", "Domingo"]
+    dia_semana_str = DIAS_SEMANA_EXT[data_alvo.weekday()]
     # Coluna A = data, Coluna E (índice 4) = texto da atividade
-    # ATENÇÃO: se a estrutura da planilha mudar, ajustar o índice abaixo
     COL_ATIVIDADE = 4
     prog_do_dia = []
     if not df_prog.empty:
@@ -598,21 +629,262 @@ with col_prog:
       {items_html}
     </div>""", unsafe_allow_html=True)
     st.markdown("<div style='margin-top:0.5rem'></div>", unsafe_allow_html=True)
-    # Botões de navegação: Anterior | Hoje | Próximo
     c_prev, c_hoje, c_next = st.columns(3)
     with c_prev:
         st.button("⬅️ Anterior", on_click=navegar_dias, args=(-1,), use_container_width=True)
     with c_hoje:
-        # Desabilita "Hoje" quando já está no dia atual (offset == 0)
         st.button("📅 Hoje", on_click=voltar_hoje, use_container_width=True,
                   disabled=(st.session_state.prog_offset == 0))
     with c_next:
         st.button("Próximo ➡️", on_click=navegar_dias, args=(1,), use_container_width=True)
 
-# ─── FOOTER ───────────────────────────────────────────────────────────────────
+# ─── FOOTER DO PAINEL ────────────────────────────────────────────────────────
 fonte_label = "Google Sheets (online)" if fonte_dados == "online" else "arquivo local (xlsx)"
 st.markdown(f"""
 <div style="text-align:center;margin-top:1.5rem;color:#8a9ab0;font-size:0.72rem">
   COGERH – Companhia de Gestão dos Recursos Hídricos &nbsp;|&nbsp; GR Litoral / Itapipoca &nbsp;|&nbsp;
   Fonte: {fonte_label} &nbsp;|&nbsp; Cache: 5 min
 </div>""", unsafe_allow_html=True)
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# CALENDÁRIO DE ATIVIDADES (abaixo do painel)
+# ══════════════════════════════════════════════════════════════════════════
+st.markdown("<div style='margin-top:2.5rem'></div>", unsafe_allow_html=True)
+
+CAL_SHEET_ID = SHEET_ID
+CAL_GID = "507430155"
+CAL_CSV_URL = f"https://docs.google.com/spreadsheets/d/{CAL_SHEET_ID}/export?format=csv&gid={CAL_GID}"
+
+DIAS_SEMANA_CAL = ["SEGUNDA", "TERÇA", "QUARTA", "QUINTA", "SEXTA", "SÁBADO", "DOMINGO"]
+MESES_PT = ["", "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+            "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
+MAX_ATIVIDADES_DIA = 10
+
+CATEGORIAS = [
+    ("Reunião",          ["reunião", "reuniao", "encontro"],                       "#4A90D9"),
+    ("Mobilização",      ["mobilização", "mobilizacao"],                           "#E67E22"),
+    ("Publicação/Story", ["publicar", "publicação", "publicacao", "story", "post", "reels", "matéria", "materia"], "#9B59B6"),
+    ("Gravação",         ["gravação", "gravacao", "vídeo", "video"],                "#1ABC9C"),
+    ("Faturamento",      ["faturamento", "leitura", "hidrômetro", "hidrometro"],    "#27AE60"),
+    ("Instrumentação",   ["instrumentação", "instrumentacao", "piezômetro", "piezometro", "percolação", "percolacao"], "#16A085"),
+    ("Monitoramento",    ["monitoramento", "captação", "captacao", "perenização", "perenizacao", "sigerh"], "#2980B9"),
+    ("Vistoria/Fiscaliz.", ["vistoria", "fiscalização", "fiscalizacao", "inspeção", "inspecao"], "#C0392B"),
+    ("Coleta/Água",      ["coleta", "análise qualitativa", "analise qualitativa", "sonda"], "#3498DB"),
+    ("Diárias/Admin.",   ["diária", "diaria", "protheus", "estoque", "frota", "almoxarifado", "combustível", "combustivel"], "#7F8C8D"),
+    ("Relatório/Ata",    ["relatório", "relatorio", "ata", "parecer", "diagnóstico", "diagnostico"], "#8E44AD"),
+    ("Capacitação",      ["capacitação", "capacitacao", "curso", "treinamento", "oficina"], "#D35400"),
+    ("Feriado/Data",     ["feriado", "ponto facultativo", "data magna", "carnaval", "sexta-feira santa"], "#BDC3C7"),
+]
+COR_PADRAO = "#95A5A6"
+
+
+def categorizar(texto: str):
+    if not isinstance(texto, str) or not texto.strip():
+        return "Outros", COR_PADRAO
+    t = texto.lower()
+    for nome, palavras, cor in CATEGORIAS:
+        if any(p in t for p in palavras):
+            return nome, cor
+    return "Outros", COR_PADRAO
+
+
+@st.cache_data(ttl=600)
+def carregar_dados_calendario():
+    resp = requests.get(CAL_CSV_URL, timeout=15)
+    resp.raise_for_status()
+    df_raw = pd.read_csv(StringIO(resp.text), header=None)
+
+    df = df_raw.iloc[6:, [0, 4]].copy()
+    df.columns = ["data_raw", "atividade"]
+    df = df.dropna(subset=["data_raw"])
+
+    df["data"] = pd.to_datetime(df["data_raw"], format="%d/%m/%Y", errors="coerce")
+    df = df.dropna(subset=["data"])
+    df["data"] = df["data"].dt.date
+    df["atividade"] = df["atividade"].fillna("").astype(str).str.strip()
+    df = df[df["atividade"] != ""]
+
+    cat_cor = df["atividade"].apply(categorizar)
+    df["categoria"] = cat_cor.apply(lambda x: x[0])
+    df["cor"] = cat_cor.apply(lambda x: x[1])
+
+    return df.sort_values("data").reset_index(drop=True)
+
+
+def gerar_observacoes_key(dia: date) -> str:
+    return f"obs_{dia.isoformat()}"
+
+
+hoje = date.today()
+if "cal_ano" not in st.session_state:
+    st.session_state.cal_ano = hoje.year
+if "cal_mes" not in st.session_state:
+    st.session_state.cal_mes = hoje.month
+if "cal_view" not in st.session_state:
+    st.session_state.cal_view = "mes"
+if "cal_semana_ref" not in st.session_state:
+    st.session_state.cal_semana_ref = hoje
+if "cal_observacoes" not in st.session_state:
+    st.session_state.cal_observacoes = {}
+
+try:
+    df_cal = carregar_dados_calendario()
+except Exception as e:
+    st.error(f"Erro ao carregar a planilha do calendário: {e}")
+    df_cal = pd.DataFrame(columns=["data", "atividade", "categoria", "cor"])
+
+
+def atividades_do_dia(dia: date):
+    return df_cal[df_cal["data"] == dia].to_dict("records")
+
+
+def render_mes_calendario():
+    ano, mes = st.session_state.cal_ano, st.session_state.cal_mes
+
+    st.markdown(f"""
+    <div class="cal-header">
+        <div class="cal-title">📅 MINHA SEMANA / MÊS</div>
+        <div style="font-size:20px; font-weight:700; background:#F5A623; padding:6px 18px; border-radius:6px;">
+            {MESES_PT[mes].upper()} / {ano}
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    c1, c2, c3, c4, c5 = st.columns([1, 1, 4, 1, 1])
+    with c1:
+        if st.button("◀ Ano", key="cal_btn_ano_prev"):
+            st.session_state.cal_ano -= 1
+            st.rerun()
+    with c2:
+        if st.button("◀ Mês", key="cal_btn_mes_prev"):
+            if mes == 1:
+                st.session_state.cal_mes, st.session_state.cal_ano = 12, ano - 1
+            else:
+                st.session_state.cal_mes -= 1
+            st.rerun()
+    with c4:
+        if st.button("Mês ▶", key="cal_btn_mes_next"):
+            if mes == 12:
+                st.session_state.cal_mes, st.session_state.cal_ano = 1, ano + 1
+            else:
+                st.session_state.cal_mes += 1
+            st.rerun()
+    with c5:
+        if st.button("Ano ▶", key="cal_btn_ano_next"):
+            st.session_state.cal_ano += 1
+            st.rerun()
+
+    cores_semana = ["#F4D03F", "#5DADE2", "#F0B27A", "#52BE80", "#5DADE2", "#EC7063", "#A569BD"]
+    cols = st.columns(7)
+    for i, dia_nome in enumerate(DIAS_SEMANA_CAL):
+        cols[i].markdown(
+            f'<div class="dia-semana-label" style="background:{cores_semana[i]};color:white;">{dia_nome}</div>',
+            unsafe_allow_html=True)
+
+    cal_obj = calendar.Calendar(firstweekday=0)
+    semanas = cal_obj.monthdatescalendar(ano, mes)
+
+    for semana in semanas:
+        cols = st.columns(7)
+        for i, dia in enumerate(semana):
+            with cols[i]:
+                no_mes = dia.month == mes
+                ativs = atividades_do_dia(dia)
+                borda = "#F5A623" if dia == hoje else "#ddd"
+                opacidade = "1" if no_mes else "0.35"
+
+                pills_html = ""
+                for a in ativs[:MAX_ATIVIDADES_DIA]:
+                    texto = a["atividade"][:60] + ("…" if len(a["atividade"]) > 60 else "")
+                    pills_html += f'<div class="atividade-pill" style="background:{a["cor"]};">{texto}</div>'
+                if len(ativs) > MAX_ATIVIDADES_DIA:
+                    pills_html += f'<div class="mais-info">+{len(ativs)-MAX_ATIVIDADES_DIA} mais</div>'
+
+                card_html = (
+                    f'<div class="day-card" style="border-color:{borda}; opacity:{opacidade};">'
+                    f'<div class="day-num">{dia.day}</div>'
+                    f'{pills_html}'
+                    f'</div>'
+                )
+                st.markdown(card_html, unsafe_allow_html=True)
+
+                label_btn = "Abrir ›" if ativs else "·"
+                if st.button(label_btn, key=f"cal_btn_{dia.isoformat()}", use_container_width=True):
+                    st.session_state.cal_semana_ref = dia
+                    st.session_state.cal_view = "semana"
+                    st.rerun()
+
+    with st.expander("🎨 Legenda de categorias"):
+        leg_cols = st.columns(4)
+        for idx, (nome, _, cor) in enumerate(CATEGORIAS):
+            with leg_cols[idx % 4]:
+                st.markdown(
+                    f'<span style="background:{cor};color:white;padding:2px 8px;border-radius:4px;font-size:12px;">{nome}</span>',
+                    unsafe_allow_html=True)
+
+
+def render_semana_calendario():
+    ref = st.session_state.cal_semana_ref
+    inicio_semana = ref - timedelta(days=ref.weekday())
+    dias = [inicio_semana + timedelta(days=i) for i in range(7)]
+
+    c1, c2, c3 = st.columns([1, 5, 1])
+    with c1:
+        if st.button("◀ Voltar ao mês", key="cal_btn_voltar_mes"):
+            st.session_state.cal_view = "mes"
+            st.rerun()
+    with c2:
+        st.markdown(
+            f"<h2 style='text-align:center;'>MINHA SEMANA — {inicio_semana.strftime('%d/%m')} a {dias[-1].strftime('%d/%m/%Y')}</h2>",
+            unsafe_allow_html=True)
+    with c3:
+        nav1, nav2 = st.columns(2)
+        with nav1:
+            if st.button("◀", key="cal_btn_sem_prev"):
+                st.session_state.cal_semana_ref = ref - timedelta(days=7)
+                st.rerun()
+        with nav2:
+            if st.button("▶", key="cal_btn_sem_next"):
+                st.session_state.cal_semana_ref = ref + timedelta(days=7)
+                st.rerun()
+
+    cores_semana = ["#F4D03F", "#5DADE2", "#F0B27A", "#52BE80", "#5DADE2", "#EC7063", "#A569BD"]
+    cols = st.columns(7)
+
+    for i, dia in enumerate(dias):
+        with cols[i]:
+            classe_extra = " week-card-hoje" if dia == hoje else ""
+
+            ativs = atividades_do_dia(dia)
+            pills_html = ""
+            if not ativs:
+                pills_html = '<div class="sem-atividade">Sem atividades</div>'
+            else:
+                for a in ativs[:MAX_ATIVIDADES_DIA]:
+                    pills_html += f'<div class="atividade-pill" style="background:{a["cor"]};">{a["atividade"]}</div>'
+                if len(ativs) > MAX_ATIVIDADES_DIA:
+                    pills_html += f'<div class="mais-info">+{len(ativs)-MAX_ATIVIDADES_DIA} atividades não exibidas</div>'
+
+            bloco_html = (
+                f'<div class="week-header" style="background:{cores_semana[i]};">'
+                f'{DIAS_SEMANA_CAL[i]}<br><span class="data-sub">{dia.strftime("%d/%m")}</span>'
+                f'</div>'
+                f'<div class="week-card{classe_extra}">{pills_html}</div>'
+            )
+            st.markdown(bloco_html, unsafe_allow_html=True)
+
+    st.markdown("---")
+    st.subheader("📝 Observações da semana")
+    chave = gerar_observacoes_key(inicio_semana)
+    valor_atual = st.session_state.cal_observacoes.get(chave, "")
+    novo_valor = st.text_area("Anotações, lembretes ou pendências desta semana:",
+                               value=valor_atual, height=120, key=f"cal_ta_{chave}")
+    st.session_state.cal_observacoes[chave] = novo_valor
+    st.caption("⚠️ Observações ficam salvas apenas durante esta sessão do navegador.")
+
+
+if st.session_state.cal_view == "mes":
+    render_mes_calendario()
+else:
+    render_semana_calendario()
