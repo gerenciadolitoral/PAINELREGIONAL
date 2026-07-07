@@ -273,10 +273,10 @@ def load_data():
         dfs = {}
         for nome, url in SHEETS.items():
             resp = requests.get(url, timeout=15)
-            resp.encoding = "utf-8"
             resp.raise_for_status()
             dfs[nome] = pd.read_csv(
-                io.StringIO(resp.text),
+                io.BytesIO(resp.content),
+                encoding="utf-8-sig",
                 header=None,
                 dtype=str,
                 keep_default_na=False,
@@ -656,7 +656,7 @@ CAL_SHEET_ID = SHEET_ID
 CAL_GID = "507430155"
 CAL_CSV_URL = f"https://docs.google.com/spreadsheets/d/{CAL_SHEET_ID}/export?format=csv&gid={CAL_GID}"
 
-DIAS_SEMANA_CAL = ["SEGUNDA", "TERÇA", "QUARTA", "QUINTA", "SEXTA", "SÁBADO", "DOMINGO"]
+DIAS_SEMANA_CAL = ["DOMINGO", "SEGUNDA", "TERÇA", "QUARTA", "QUINTA", "SEXTA", "SÁBADO"]
 MESES_PT = ["", "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
             "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
 MAX_ATIVIDADES_DIA = 10
@@ -693,7 +693,11 @@ def categorizar(texto: str):
 def carregar_dados_calendario():
     resp = requests.get(CAL_CSV_URL, timeout=15)
     resp.raise_for_status()
-    df_raw = pd.read_csv(StringIO(resp.text), header=None)
+    df_raw = pd.read_csv(
+        io.BytesIO(resp.content),
+        encoding="utf-8-sig",
+        header=None
+    )
 
     df = df_raw.iloc[6:, [0, 4]].copy()
     df.columns = ["data_raw", "atividade"]
@@ -775,14 +779,14 @@ def render_mes_calendario():
             st.session_state.cal_ano += 1
             st.rerun()
 
-    cores_semana = ["#F4D03F", "#5DADE2", "#F0B27A", "#52BE80", "#5DADE2", "#EC7063", "#A569BD"]
+    cores_semana = ["#EC7063", "#F4D03F", "#5DADE2", "#F0B27A", "#52BE80", "#5DADE2", "#A569BD"]
     cols = st.columns(7)
     for i, dia_nome in enumerate(DIAS_SEMANA_CAL):
         cols[i].markdown(
             f'<div class="dia-semana-label" style="background:{cores_semana[i]};color:white;">{dia_nome}</div>',
             unsafe_allow_html=True)
 
-    cal_obj = calendar.Calendar(firstweekday=0)
+    cal_obj = calendar.Calendar(firstweekday=6)
     semanas = cal_obj.monthdatescalendar(ano, mes)
 
     for semana in semanas:
@@ -826,7 +830,8 @@ def render_mes_calendario():
 
 def render_semana_calendario():
     ref = st.session_state.cal_semana_ref
-    inicio_semana = ref - timedelta(days=ref.weekday())
+    dias_desde_domingo = (ref.weekday() + 1) % 7
+    inicio_semana = ref - timedelta(days=dias_desde_domingo)
     dias = [inicio_semana + timedelta(days=i) for i in range(7)]
 
     c1, c2, c3 = st.columns([1, 5, 1])
@@ -849,7 +854,7 @@ def render_semana_calendario():
                 st.session_state.cal_semana_ref = ref + timedelta(days=7)
                 st.rerun()
 
-    cores_semana = ["#F4D03F", "#5DADE2", "#F0B27A", "#52BE80", "#5DADE2", "#EC7063", "#A569BD"]
+    cores_semana = ["#EC7063", "#F4D03F", "#5DADE2", "#F0B27A", "#52BE80", "#5DADE2", "#A569BD"]
     cols = st.columns(7)
 
     for i, dia in enumerate(dias):
