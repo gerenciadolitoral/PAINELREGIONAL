@@ -212,8 +212,15 @@ html, body, [class*="css"] {{ font-family: 'Inter', sans-serif; }}
 .js-plotly-plot .plotly .modebar {{ display: none !important; }}
 
 /* ---- Estilos do calendário (abaixo) ---- */
-.cal-header {{background:#1c1c1c; color:white; padding:14px 18px; border-radius:8px 8px 0 0;
-             display:flex; justify-content:space-between; align-items:center;}}
+.cal-header {{
+    background: linear-gradient(135deg, #0b3d91 0%, #1a8a8a 100%);
+    color: white; 
+    padding: 14px 18px; 
+    border-radius: 8px 8px 0 0;
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+}}
 .cal-title {{font-size:1.6rem; font-weight:800; letter-spacing:1px; margin:0;}}
 .dia-semana-label {{text-align:center; font-weight:800; padding:6px; border-radius:6px;
                     margin-bottom:4px; font-size:0.8rem;}}
@@ -240,6 +247,26 @@ html, body, [class*="css"] {{ font-family: 'Inter', sans-serif; }}
 }}
 .sem-atividade {{ font-size:0.72rem; color:#999; font-style:italic; }}
 .mais-info {{ font-size:0.68rem; color:#888; }}
+
+/* Estilo unificado para os botões do Streamlit */
+div[data-testid="stButton"] > button {{
+    background: linear-gradient(90deg, #0b3d91 0%, #1a8a8a 100%) !important;
+    color: #ffffff !important;
+    border: none !important;
+    transition: transform 0.2s, box-shadow 0.2s;
+}}
+
+div[data-testid="stButton"] > button:hover {{
+    background: linear-gradient(90deg, #1a8a8a 0%, #0b3d91 100%) !important;
+    color: #ffffff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(11,61,145,0.3) !important;
+}}
+
+div[data-testid="stButton"] > button p {{
+    color: #ffffff !important;
+    font-weight: 600;
+}}
 </style>
 """, unsafe_allow_html=True)
 
@@ -250,7 +277,6 @@ XLSX_LOCAL = Path(__file__).parent / "painel da grlitoral.xlsx"
 SHEETS = {
     "metas":  f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&sheet=metas",
     "açudes": f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&sheet=a%C3%A7udes",
-    # gid correto da aba de programação
     "prog":   f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&gid=507430155",
 }
 
@@ -470,12 +496,12 @@ with col5:
 st.markdown('<div class="section-header">📋 NÚCLEO DE GESTÃO</div>', unsafe_allow_html=True)
 
 gest_items = [
-    ("🫗 Alocações",     gest["aloc_real"],    gest["aloc_meta"],    f"{int(gest['aloc_real'])}/{int(gest['aloc_meta'])} reuniões"),
-    ("📈 Acompanhar",    gest["acomp_real"],   gest["acomp_meta"],   f"{int(gest['acomp_real'])}/{int(gest['acomp_meta'])} reuniões"),
-    ("📊 Avaliação",     gest["aval_real"],    gest["aval_meta"],    f"{int(gest['aval_real'])}/{int(gest['aval_meta'])} reuniões"),
+    ("🫗 Alocações",      gest["aloc_real"],    gest["aloc_meta"],    f"{int(gest['aloc_real'])}/{int(gest['aloc_meta'])} reuniões"),
+    ("📈 Acompanhar",     gest["acomp_real"],   gest["acomp_meta"],   f"{int(gest['acomp_real'])}/{int(gest['acomp_meta'])} reuniões"),
+    ("📊 Avaliação",      gest["aval_real"],    gest["aval_meta"],    f"{int(gest['aval_real'])}/{int(gest['aval_meta'])} reuniões"),
     ("👥 CBH Ordinária", gest["cbh_ord_real"], gest["cbh_ord_meta"], f"{int(gest['cbh_ord_real'])}/{int(gest['cbh_ord_meta'])} partic. - ({int(gest['reuord'])} / 4)"),
     ("👥 CBH Extraord.", gest["cbh_ext_real"], gest["cbh_ext_meta"], f"{int(gest['cbh_ext_real'])}/{int(gest['cbh_ext_meta'])} partic. - ({int(gest['reuex'])} / 4)"),
-    ("👥 CBH Fórum",     gest["cbh_for_real"], gest["cbh_for_meta"], f"{int(gest['cbh_for_real'])}/{int(gest['cbh_for_meta'])} reuniões"),
+    ("👥 CBH Fórum",      gest["cbh_for_real"], gest["cbh_for_meta"], f"{int(gest['cbh_for_real'])}/{int(gest['cbh_for_meta'])} reuniões"),
     ("👩‍🏫 Capacitações",  gest["cap_real"],     gest["cap_meta"],     f"{int(gest['cap_real'])}/{int(gest['cap_meta'])} capacit."),
 ]
 
@@ -500,7 +526,7 @@ oper_items = [
      f"Novos: {int(oper['cob_novos_r'])} | Inad.: {int(oper['cob_inad_r'])}<br>Real: {int(oper['cob_real'])}/{int(oper['cob_meta'])}"),
     ("🔎 Fiscalização",    oper["fisc_real"],  oper["fisc_meta"],
      f"Com RV: {int(oper['fisc_rv'])} | Sem RV: {int(oper['fisc_srv'])}<br>Real: {int(oper['fisc_real'])}/{int(oper['fisc_meta'])}"),
-    ("⏲️ Medidores",       oper["med_final"],  100,
+    ("⏲️ Medidores",        oper["med_final"],  100,
      f"Manut.: {int(oper['med_man_real'])}/{int(oper['med_man_meta'])} | Inst.: {int(oper['med_inst_real'])}/{int(oper['med_inst_meta'])}<br>"
      f"Med.: {int(oper['med_med_real'])}/{int(oper['med_med_meta'])}"),
     ("🚢 Batimetria",      oper["bati_real"],  oper["bati_meta"],
@@ -662,8 +688,8 @@ MESES_PT = ["", "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
 MAX_ATIVIDADES_DIA = 10
 
 CATEGORIAS = [
-    ("Reunião",          ["reunião", "reuniao", "encontro"],                       "#4A90D9"),
-    ("Mobilização",      ["mobilização", "mobilizacao"],                           "#E67E22"),
+    ("Reunião",          ["reunião", "reuniao", "encontro"],                        "#4A90D9"),
+    ("Mobilização",      ["mobilização", "mobilizacao"],                            "#E67E22"),
     ("Publicação/Story", ["publicar", "publicação", "publicacao", "story", "post", "reels", "matéria", "materia"], "#9B59B6"),
     ("Gravação",         ["gravação", "gravacao", "vídeo", "video"],                "#1ABC9C"),
     ("Faturamento",      ["faturamento", "leitura", "hidrômetro", "hidrometro"],    "#27AE60"),
