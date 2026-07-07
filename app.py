@@ -690,17 +690,17 @@ MAX_ATIVIDADES_DIA = 10
 CATEGORIAS = [
     ("Reunião",          ["reunião", "reuniao", "encontro"],                        "#4A90D9"),
     ("Mobilização",      ["mobilização", "mobilizacao"],                            "#E67E22"),
-    ("Publicação/Story", ["publicar", "publicação", "publicacao", "story", "post", "reels", "matéria", "materia", "parabenizar"], "#9B59B6"),
+    ("Publicação/Story", ["publicar", "publicação", "publicacao", "story", "post", "reels", "matéria", "materia", "Parabenizar", "parabenizar"], "#9B59B6"),
     ("Gravação",         ["gravação", "gravacao", "vídeo", "video"],                "#1ABC9C"),
     ("Faturamento",      ["faturamento", "leitura", "hidrômetro", "hidrometro"],    "#27AE60"),
     ("Instrumentação",   ["instrumentação", "instrumentacao", "piezômetro", "piezometro", "percolação", "percolacao"], "#16A085"),
     ("Monitoramento",    ["monitoramento", "captação", "captacao", "perenização", "perenizacao", "sigerh"], "#2980B9"),
-    ("Vistoria/Fiscaliz.", ["vistoria", "fiscalização", "fiscalizacao", "inspeção", "inspecao"], "#C0392B"),
+    ("Vistoria/Fiscaliz.", ["vistoria", "fiscalização", "fiscalizacao", "inspeção", "inspecao"], "#BDC3C7"),
     ("Coleta/Água",      ["coleta", "análise qualitativa", "analise qualitativa", "sonda"], "#3498DB"),
     ("Diárias/Admin.",   ["diária", "diaria", "protheus", "estoque", "frota", "almoxarifado", "combustível", "combustivel", "logistico","logístico"], "#D8BFD8"),
     ("Relatório/Ata",    ["relatório", "relatorio", "ata", "parecer", "diagnóstico", "diagnostico"], "#8E44AD"),
     ("Capacitação",      ["capacitação", "capacitacao", "curso", "treinamento", "oficina"], "#D35400"),
-    ("Feriado/Data",     ["feriado", "ponto facultativo", "data magna", "carnaval", "sexta-feira santa"], "#BDC3C7"),
+    ("Feriado/Data",     ["feriado", "ponto facultativo", "data magna", "carnaval", "sexta-feira santa"], "#C0392B"),
 ]
 COR_PADRAO = "#95A5A6"
 
