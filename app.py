@@ -697,7 +697,7 @@ CATEGORIAS = [
     ("Monitoramento",    ["monitoramento", "captação", "captacao", "perenização", "perenizacao", "sigerh"], "#2980B9"),
     ("Vistoria/Fiscaliz.", ["vistoria", "fiscalização", "fiscalizacao", "inspeção", "inspecao"], "#BDC3C7"),
     ("Coleta/Água",      ["coleta", "análise qualitativa", "analise qualitativa", "sonda"], "#3498DB"),
-    ("Diárias/Admin.",   ["diária", "diaria", "protheus", "estoque", "frota", "almoxarifado", "combustível", "combustivel", "logistico","logístico"], "#D8BFD8"),
+    ("Diárias/Admin.",   ["diária", "diaria", "protheus", "estoque", "frota", "almoxarifado", "combustível", "combustivel", "logistico","logístico"], "#20B2AA"),
     ("Relatório/Ata",    ["relatório", "relatorio", "ata", "parecer", "diagnóstico", "diagnostico"], "#8E44AD"),
     ("Capacitação",      ["capacitação", "capacitacao", "curso", "treinamento", "oficina"], "#D35400"),
     ("Feriado/Data",     ["feriado", "ponto facultativo", "data magna", "carnaval", "sexta-feira santa"], "#C0392B"),
