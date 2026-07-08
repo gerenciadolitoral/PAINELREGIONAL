@@ -226,7 +226,7 @@ html, body, [class*="css"] {{ font-family: 'Inter', sans-serif; }}
                     margin-bottom:4px; font-size:0.8rem;}}
 .day-card {{
     border:2px solid #ddd; border-radius:6px; padding:6px;
-    height:170px; overflow-y:auto; box-sizing:border-box;
+    height:170px; overflow-y:auto; box-sizing:border-box; background: #f8fbff;
 }}
 .day-num {{font-weight:700; font-size:0.95rem; margin-bottom:4px;}}
 .week-card {{
