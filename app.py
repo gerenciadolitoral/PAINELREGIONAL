@@ -780,11 +780,12 @@ def render_mes_calendario():
         </div>
     </div>
     """, unsafe_allow_html=True)
+    
 
-st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
-c1, c2, c3, c4, c5 = st.columns([1, 1, 4, 1, 1])
+    # Espaço entre o cabeçalho e os botões
+    st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
 
-
+    
     c1, c2, c3, c4, c5 = st.columns([1, 1, 4, 1, 1])
     with c1:
         if st.button("◀ Ano", key="cal_btn_ano_prev"):
